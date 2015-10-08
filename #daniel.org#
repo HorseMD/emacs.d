@@ -26,7 +26,7 @@ I like to keep a directory in =~/.emacs.d= to throw things in to be put in Emacs
 
 (package-initialize)
 #+end_src
-
+"
 ** Custom Packages
 
 Let's use use-package!
@@ -168,9 +168,9 @@ Sometimes computers don't have the same fonts installed on as my main computer, 
 #+begin_src emacs-lisp
 (use-package dynamic-fonts
   :ensure t
-  :init (progn
-            (setq dynamic-fonts-preferred-monospace-point-size 11)
-            (setq dynamic-fonts-preferred-proportional-point-size 11)
+  :config (progn
+            (setq dynamic-fonts-preferred-monospace-point-size 12)
+            (setq dynamic-fonts-preferred-proportional-point-size 12)
             (setq dynamic-fonts-preferred-monospace-fonts
                   '("Fira Mono"
                     "Inconsolata"
@@ -182,7 +182,7 @@ Sometimes computers don't have the same fonts installed on as my main computer, 
                     "Verdana"
                     "Arial"))
             (dynamic-fonts-setup)))
-#+end_src
+#+end_src emacs-lisp
 
 *** Misc
 
