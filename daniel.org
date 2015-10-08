@@ -40,6 +40,12 @@ Let's use use-package!
   (require 'use-package))
 #+end_src
 
+Just in case we're from the past, let's prefer UTF-8 before we do anything else.
+
+#+begin_src
+(prefer-coding-system 'utf-8)
+#+end_src
+
 *** Install
 
 With =use-package=, we can easily and cleanly organise and configure plugins. First a few packages
