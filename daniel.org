@@ -163,27 +163,6 @@ My theme tastes change regularly enough to warrant keeping configuration for old
   :init (load-theme 'sanityinc-tomorrow-eighties 'no-confirm))
 #+end_src
 
-Sometimes computers don't have the same fonts installed on as my main computer, so we set fallbacks with =dynamic-fonts= package.
-
-#+begin_src emacs-lisp
-(use-package dynamic-fonts
-  :ensure t
-  :init (progn
-            (setq dynamic-fonts-preferred-monospace-point-size 11)
-            (setq dynamic-fonts-preferred-proportional-point-size 11)
-            (setq dynamic-fonts-preferred-monospace-fonts
-                  '("Fira Mono"
-                    "Inconsolata"
-                    "Droid Sans Mono"
-                    "Consolas"))
-            (setq dynamic-fonts-preferred-proportional-fonts
-                  '("Roboto"
-                    "Helvetica"
-                    "Verdana"
-                    "Arial"))
-            (dynamic-fonts-setup)))
-#+end_src
-
 *** Misc
 
 Misc settings that should probably be somewhere else:
@@ -208,6 +187,24 @@ Misc settings that should probably be somewhere else:
                              (compose-region (match-beginning 1)
                                              (match-end 1)
                                              "\u03BB"))))))
+#+end_src
+
+*** Fonts
+
+I can't really make up my mind what my preferred font is, but at the moment it's Fira Mono.
+It can be downloaded from Fira's [[https://github.com/mozilla/Fira][GitHub repo]] in the /ttf folder.
+
+Other fonts I like include (in no particular order) Inconsolata, Consolas, Droid Sans Mono, Ubuntu Mono.
+
+[[http://larsenwork.com/monoid/][Monoid]] seems cool, if a little edgy.
+
+#+begin_src emacs-lisp
+(set-face-attribute 'default nil
+                    :family "Fira Mono"
+                    :height 105 :weight 'medium)
+(set-face-attribute 'variable-pitch nil
+                    :family "Droid Sans"
+                    :height 105 :weight 'medium)
 #+end_src
 
 *** Executables
