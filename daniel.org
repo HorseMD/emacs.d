@@ -91,12 +91,10 @@ And then everything else:
             (sml/setup)
             (add-to-list 'sml/replacer-regexp-list '("^~/dotfiles/" ":dotfiles:") t)))
 (use-package git-gutter-fringe
-  :config (progn
-            (global-git-gutter-mode 1)
+  :config (global-git-gutter-mode 1))
 (use-package org-indent                 ; indent text to level of headings 
   :diminish org-indent-mode
-  :config (setq org-startup-indented t))
-           (setq git-gutter:modified-sign "~")))
+  :init (setq org-startup-indented t))
 #+end_src
 
 Lisp stuff:
