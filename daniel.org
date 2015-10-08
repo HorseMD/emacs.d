@@ -42,13 +42,6 @@ Let's use use-package!
 
 *** Install
 
-Turns out =use-package= isn't needed at runtime:
-
-#+begin_src emacs-lisp
-(eval-when-compile
-  (require 'use-package))
-#+end_src
-
 With =use-package=, we can easily and cleanly organise and configure plugins. First a few packages
 that require no configuration (other than maybe an ensure):
 
