@@ -76,7 +76,7 @@ And then everything else:
           (font-lock-add-keywords 'js2-mode
                                   `(("\\(function *\\)("
                                      (0 (progn
-                                          (compose-region (match-beginning 1) (match-end 1) "\u0192"))))))))
+                                          (compose-region (match-beginning 1) (match-end 1) "\u0192")))))))) ; cursive f symbol
 (use-package flycheck
   :ensure
   :init (add-hook 'prog-mode-hook 'flycheck-mode)
@@ -186,7 +186,7 @@ Misc settings that should probably be somewhere else:
   '(("(\\(lambda\\)\\>" (0 (prog1 ()
                              (compose-region (match-beginning 1)
                                              (match-end 1)
-                                             "\u03BB"))))))
+                                             "\u03BB")))))) ; lambda symbol
 #+end_src
 
 *** Fonts
