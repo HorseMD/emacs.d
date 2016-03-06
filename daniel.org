@@ -63,11 +63,13 @@ And then everything else:
 #+begin_src emacs-lisp
 (use-package hydra
   :ensure t)
+
 (use-package web-mode
   :ensure t
   :init (progn
           (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
           (add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode))))
+
 (use-package js2-mode
   :ensure t
   :init (progn
@@ -76,25 +78,29 @@ And then everything else:
                                   `(("\\(function *\\)("
                                      (0 (progn
                                           (compose-region (match-beginning 1) (match-end 1) "\u0192")))))))) ; cursive f symbol
+
 (use-package flycheck
-  :ensure
+  :ensure t
   :init (add-hook 'prog-mode-hook 'flycheck-mode)
   :config (setq-default flycheck-disabled-checkers '(emacs-lisp-checkdoc)))
+
 (use-package zencoding-mode
   :init (add-hook 'sgml-mode-hook 'zencoding-mode))
+
 (use-package expand-region
+  :ensure t
   :init (global-set-key (kbd "C-=") 'er/expand-region))
-(use-package smart-mode-line
-  :config (progn
-            (setq sml/no-confirm-load-theme t)
-            (setq sml/theme 'respectful)
-            (sml/setup)
-            (add-to-list 'sml/replacer-regexp-list '("^~/dotfiles/" ":dotfiles:") t)))
+
 (use-package git-gutter-fringe
+  :ensure t
   :config (global-git-gutter-mode 1))
+
 (use-package org-indent                 ; indent text to level of headings 
   :diminish org-indent-mode
   :init (setq org-startup-indented t))
+
+(use-package magit
+  :ensure t)
 #+end_src
 
 Lisp stuff:
@@ -103,39 +109,35 @@ Lisp stuff:
 (use-package rainbow-delimiters
   :ensure t
   :init (add-hook 'prog-mode-hook 'rainbow-delimiters-mode))
+
 (use-package paredit
-  :init (progn
+  :ensure t ; please
+  :config (progn
           (add-hook 'lisp-mode-hook 'enable-paredit-mode)
           (add-hook 'emacs-lisp-mode-hook 'enable-paredit-mode)))
+
 (use-package lispy
   :disabled t
   :config (progn
           (add-hook 'lisp-mode-hook (lambda () (lispy-mode 1)))
           (add-hook 'emacs-lisp-mode-hook (lambda () (lispy-mode 1)))))
+
 (use-package clojure-mode
   :init (add-hook 'clojure-mode-hook 'enable-paredit-mode))
+
 (use-package cider
   :config (setq cider-repl-result-prefix ";; => ")
   :init (progn
-          (add-hook 'cider-repl-mode-hook 'paredit-mode)
+          (add-hook 'cider-repl-mode-hook 'enable-paredit-mode)
           (add-hook 'cider-mode-hook #'eldoc-mode)))
 #+end_src
 
-Vim-convert stuff:
+Vim stuff:
 
 #+begin_src emacs-lisp
 (use-package evil
+  :ensure t
   :config (evil-mode t))
-(use-package vimish-fold
-  :init (progn
-          (vimish-fold-global-mode 1)
-          (global-set-key (kbd "C-c f")
-                          (defhydra hydra-fold (:color blue)
-                            "folding"
-                            ("c" vimish-fold "create")
-                            ("t" vimish-fold-toggle "toggle") 
-                            ("d" vimish-fold-delete "delete")
-                            ("q" nil "quit")))))
 #+end_src
 
 My theme tastes change regularly enough to warrant keeping configuration for old ones:
@@ -157,7 +159,13 @@ My theme tastes change regularly enough to warrant keeping configuration for old
           (set-face-attribute 'org-document-title nil :height 140)))
 
 (use-package sanityinc-tomorrow-eighties
+  :disabled t
   :init (load-theme 'sanityinc-tomorrow-eighties 'no-confirm))
+
+(use-package moe-theme
+  :ensure t
+  :config (progn (moe-theme-set-color 'magenta)
+                 (moe-light)))
 #+end_src
 
 *** Misc
@@ -316,4 +324,7 @@ General, built-in settings for Emacs.
       kept-new-versions 4
       kept-old-versions 2
       version-control t)
+
+;; dont prompt me every time I open symlinks
+(setq vc-follow-symlinks t)
 #+end_src
