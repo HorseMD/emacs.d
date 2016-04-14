@@ -52,10 +52,10 @@ With =use-package=, we can easily and cleanly organise and configure plugins. Fi
 that require no configuration (other than maybe an ensure):
 
 #+begin_src emacs-lisp
-(use-package json-mode)
-(use-package yaml-mode)
-(use-package markdown-mode)
-(use-package diminish :ensure t)
+(use-package json-mode      :disabled t)
+(use-package yaml-mode      :disabled t)
+(use-package markdown-mode  :disabled t)
+(use-package diminish       :ensure t)
 #+end_src
 
 And then everything else:
@@ -64,28 +64,9 @@ And then everything else:
 (use-package hydra
   :ensure t)
 
-(use-package web-mode
-  :ensure t
-  :init (progn
-          (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
-          (add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode))))
-
-(use-package js2-mode
-  :ensure t
-  :init (progn
-          (add-to-list 'auto-mode-alist '("\\.js$" . js2-mode))
-          (font-lock-add-keywords 'js2-mode
-                                  `(("\\(function *\\)("
-                                     (0 (progn
-                                          (compose-region (match-beginning 1) (match-end 1) "\u0192")))))))) ; cursive f symbol
-
 (use-package flycheck
-  :ensure t
   :init (add-hook 'prog-mode-hook 'flycheck-mode)
   :config (setq-default flycheck-disabled-checkers '(emacs-lisp-checkdoc)))
-
-(use-package zencoding-mode
-  :init (add-hook 'sgml-mode-hook 'zencoding-mode))
 
 (use-package expand-region
   :ensure t
@@ -99,8 +80,43 @@ And then everything else:
   :diminish org-indent-mode
   :init (setq org-startup-indented t))
 
+(use-package calfw
+  :ensure t
+  :config (progn (require 'calfw-org)
+                 (setq cfw:org-overwrite-default-keybinding t)))
+
 (use-package magit
   :ensure t)
+
+(use-package edbi
+  ;; cpan RPC::EPC::Service DBI DBD::SQLite DBD::mysql
+  :ensure t)
+(use-package edbi-sqlite
+  :ensure t)
+
+(use-package which-key
+  :ensure t
+  :config (which-key-mode))
+#+end_src
+
+Webdev stuff:
+
+#+begin_src emacs-lisp
+(use-package zencoding-mode
+  :init (add-hook 'sgml-mode-hook 'zencoding-mode))
+
+(use-package web-mode
+  :init (progn
+          (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
+          (add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode))))
+
+(use-package js2-mode
+  :init (progn
+          (add-to-list 'auto-mode-alist '("\\.js$" . js2-mode))
+          (font-lock-add-keywords 'js2-mode
+                                  `(("\\(function *\\)("
+                                     (0 (progn
+                                          (compose-region (match-beginning 1) (match-end 1) "\u0192")))))))) ; cursive f symbol
 #+end_src
 
 Lisp stuff:
@@ -113,14 +129,14 @@ Lisp stuff:
 (use-package paredit
   :ensure t ; please
   :config (progn
-          (add-hook 'lisp-mode-hook 'enable-paredit-mode)
-          (add-hook 'emacs-lisp-mode-hook 'enable-paredit-mode)))
+            (add-hook 'lisp-mode-hook 'enable-paredit-mode)
+            (add-hook 'emacs-lisp-mode-hook 'enable-paredit-mode)))
 
 (use-package lispy
   :disabled t
   :config (progn
-          (add-hook 'lisp-mode-hook (lambda () (lispy-mode 1)))
-          (add-hook 'emacs-lisp-mode-hook (lambda () (lispy-mode 1)))))
+            (add-hook 'lisp-mode-hook (lambda () (lispy-mode 1)))
+            (add-hook 'emacs-lisp-mode-hook (lambda () (lispy-mode 1)))))
 
 (use-package clojure-mode
   :init (add-hook 'clojure-mode-hook 'enable-paredit-mode))
@@ -130,14 +146,41 @@ Lisp stuff:
   :init (progn
           (add-hook 'cider-repl-mode-hook 'enable-paredit-mode)
           (add-hook 'cider-mode-hook #'eldoc-mode)))
+
+(use-package smart-tabs-mode
+  ;; use tabs for indentation, spaces for alignment.
+  :ensure t
+  :config (add-hook 'prog-mode-hook 'smart-tabs-mode))
 #+end_src
 
 Vim stuff:
 
 #+begin_src emacs-lisp
+(use-package evil-leader
+  :ensure t
+  :config (progn (evil-leader/set-key
+                   ;; "j" 'avy-goto-char
+                   "k" 'kill-buffer
+                   "b" 'switch-to-buffer
+                   "f" 'find-file
+                   "i" 'indent-buffer
+                   "g" 'magit-status
+                   "<SPC>" 'er/expand-region)
+                 (evil-leader/set-leader "<SPC>")
+                 (global-evil-leader-mode)))
+
 (use-package evil
   :ensure t
   :config (evil-mode t))
+
+;; (use-package avy
+;;   :ensure t
+;;   :config (global-set-key (kbd "C-:") 'avy-goto-char))
+
+(use-package evil-snipe
+  ;; default snipe char is s/S, type to letters to swoop to it. s=forward, S=backward
+  :ensure t
+  :config (evil-snipe-mode 1))
 #+end_src
 
 My theme tastes change regularly enough to warrant keeping configuration for old ones:
@@ -175,9 +218,20 @@ Misc settings that should probably be somewhere else:
 #+begin_src emacs-lisp
 (ido-mode t)
 
-(setq org-log-done t)
-(setq org-agenda-files '("g:/Documents/org/agenda.org"))
-(setq org-edit-src-content-indentation 0)
+(setq org-log-done t
+      org-agenda-files '("~/org/agenda.org")
+      org-edit-src-content-indentation 0
+      org-default-notes-file (concat org-directory "/notes.org")
+      org-src-window-setup 'current-window)
+
+(setq org-capture-templates
+      '(("t" "Todo" entry
+         (file+datetree+prompt "./todo.org" "Todo")
+         "* TODO %?\nWithin: %t")
+
+        ("h" "Habit" entry
+         (file+datetree+prompt "./habits.org" "Habits")
+         "* TODO %?\nScheduled: %t")))
 
 (setq org-tag-alist '(("LEARN" . ?l)
                       ("UNIVERSITY" . ?u)
@@ -188,10 +242,10 @@ Misc settings that should probably be somewhere else:
 (setq nrepl-log-messages t)
 
 (font-lock-add-keywords 'emacs-lisp-mode
-  '(("(\\(lambda\\)\\>" (0 (prog1 ()
-                             (compose-region (match-beginning 1)
-                                             (match-end 1)
-                                             "\u03BB")))))) ; lambda symbol
+                        '(("(\\(lambda\\)\\>" (0 (prog1 ()
+                                              (compose-region (match-beginning 1)
+                                                              (match-end 1)
+                                                              "\u03BB")))))) ; lambda symbol
 #+end_src
 
 *** Fonts
@@ -255,6 +309,11 @@ to turn into a header.
   "Just open up my emacs config file."
   (interactive)
   (find-file "~/.emacs.d/daniel.org"))
+
+(defun indent-buffer ()
+  "Indent the entire buffer."
+  (interactive)
+  (indent-region (point-min) (point-max)))
 #+end_src
 
 ** Keybindings
@@ -264,9 +323,11 @@ section. Keeps the bindings with their package so they're easily found and chang
 
 #+begin_src emacs-lisp
 (global-set-key (kbd "C-c C-d") 'delete-trailing-whitespace)
-(global-set-key (kbd "C-c C-a") 'org-agenda)
 (global-set-key (kbd "C-c C-,") 'org-promote-subtree)
 (global-set-key (kbd "C-c C-.") 'org-demote-subtree)
+(global-set-key (kbd "C-c a") 'org-agenda)
+(global-set-key (kbd "C-c c") 'org-capture)
+
 
 (global-unset-key (kbd "C-z"))
 
@@ -326,5 +387,6 @@ General, built-in settings for Emacs.
       version-control t)
 
 ;; dont prompt me every time I open symlinks
+;; maybe move this to init.el
 (setq vc-follow-symlinks t)
 #+end_src
