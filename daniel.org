@@ -141,6 +141,12 @@ Lisp stuff:
 (use-package clojure-mode
   :init (add-hook 'clojure-mode-hook 'enable-paredit-mode))
 
+(use-package clj-refactor
+  :ensure t
+  :diminish clj-refactor-mode
+  :init (add-hook 'clojure-mode-hook 'clj-refactor-mode)
+  :config (cljr-add-keybindings-with-prefix "C-c ."))
+
 (use-package cider
   :config (setq cider-repl-result-prefix ";; => ")
   :init (progn
@@ -208,7 +214,10 @@ My theme tastes change regularly enough to warrant keeping configuration for old
 (use-package moe-theme
   :ensure t
   :config (progn (moe-theme-set-color 'magenta)
-                 (moe-light)))
+                 (moe-light)
+                 (use-package powerline
+                   :config (progn (powerline-moe-theme)
+                                  (display-time-mode t)))))
 #+end_src
 
 *** Misc
