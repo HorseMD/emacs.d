@@ -65,6 +65,7 @@ And then everything else:
   :ensure t)
 
 (use-package flycheck
+  :disabled t
   :init (add-hook 'prog-mode-hook 'flycheck-mode)
   :config (setq-default flycheck-disabled-checkers '(emacs-lisp-checkdoc)))
 
@@ -74,6 +75,7 @@ And then everything else:
 
 (use-package git-gutter-fringe
   :ensure t
+  :diminish git-gutter-mode
   :config (global-git-gutter-mode 1))
 
 (use-package org-indent                 ; indent text to level of headings 
@@ -96,6 +98,7 @@ And then everything else:
 
 (use-package which-key
   :ensure t
+  :diminish which-key-mode
   :config (which-key-mode))
 #+end_src
 
@@ -157,6 +160,15 @@ Lisp stuff:
   ;; use tabs for indentation, spaces for alignment.
   :ensure t
   :config (add-hook 'prog-mode-hook 'smart-tabs-mode))
+
+(use-package helm
+  ;; finally caving to using helm
+  :ensure t
+  ;:init (setq helm-buffers-fuzzy-matching nil)
+  :config (progn (helm-mode 1)
+                 (global-set-key (kbd "M-x") 'helm-M-x)
+                 (global-set-key (kbd "C-x C-f") 'helm-find-files)))
+
 #+end_src
 
 Vim stuff:
@@ -177,7 +189,14 @@ Vim stuff:
 
 (use-package evil
   :ensure t
-  :config (evil-mode t))
+  :config (progn (evil-mode t)
+                 ;; We have dd to delete line, and I don't use C-j so make sensible pageup and down
+                 (define-key evil-normal-state-map (kbd "C-j") (lambda ()
+                                                                 (interactive)
+                                                                 (evil-scroll-down nil)))
+                 (define-key evil-normal-state-map (kbd "C-k") (lambda ()
+                                                                 (interactive)
+                                                                 (evil-scroll-up nil)))))
 
 ;; (use-package avy
 ;;   :ensure t
@@ -216,8 +235,14 @@ My theme tastes change regularly enough to warrant keeping configuration for old
   :config (progn (moe-theme-set-color 'magenta)
                  (moe-light)
                  (use-package powerline
-                   :config (progn (powerline-moe-theme)
-                                  (display-time-mode t)))))
+                   :ensure t
+                   :config (progn
+                             (powerline-moe-theme)
+                             ;; call powerline-moe-theme to set the colours to fit with our theme.
+                             (powerline-center-evil-theme)
+                             (display-time-mode t)))))
+
+
 #+end_src
 
 *** Misc
@@ -235,12 +260,18 @@ Misc settings that should probably be somewhere else:
 
 (setq org-capture-templates
       '(("t" "Todo" entry
-         (file+datetree+prompt "./todo.org" "Todo")
-         "* TODO %?\nWithin: %t")
+         (file "./todo.org" "Todo")
+         "* TODO %?\nWithin: %^t")
 
-        ("h" "Habit" entry
-         (file+datetree+prompt "./habits.org" "Habits")
-         "* TODO %?\nScheduled: %t")))
+        ("i" "Idea" entry
+         (file "./ideas.org" "Ideas")
+         "* TODO %?")
+
+        ("d" "Diary" entry
+         (file "./diary.org" "Diary")
+         "* TODO %?\nAt: %^T")
+
+        ))
 
 (setq org-tag-alist '(("LEARN" . ?l)
                       ("UNIVERSITY" . ?u)
@@ -351,6 +382,11 @@ General, built-in settings for Emacs.
 ;; no scrollbars, toolbars or menubars
 (dolist (mode '(menu-bar-mode scroll-bar-mode tool-bar-mode))
   (when (fboundp mode) (funcall mode -1)))
+
+;; vimmy scrolling
+(setq scroll-margin 8
+      scroll-step 1
+      scroll-conservatively 101)
 
 ;; no wrap
 (setq-default truncate-lines t)
