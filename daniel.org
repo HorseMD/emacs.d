@@ -1,5 +1,4 @@
 #+TITLE: Emacs Configuration File
-#+OPTIONS: toc:2
 
 * Configuration
 
@@ -7,7 +6,6 @@ Essentially this file takes the place of my original =init.el= file. That file i
 used to load /this/ file, via =org-babel-load-file=.
 
 ** Setup
-
 *** Add directories
 
 I like to keep a directory in =~/.emacs.d= to throw things in to be put in Emacs's load path.
@@ -42,7 +40,7 @@ Let's use use-package!
 
 Just in case we're from the past, let's prefer UTF-8 before we do anything else.
 
-#+begin_src
+#+begin_src emacs-lisp
 (prefer-coding-system 'utf-8)
 #+end_src
 
@@ -52,27 +50,13 @@ With =use-package=, we can easily and cleanly organise and configure plugins. Fi
 that require no configuration (other than maybe an ensure):
 
 #+begin_src emacs-lisp
-(use-package json-mode      :disabled t)
-(use-package yaml-mode      :disabled t)
-(use-package markdown-mode  :disabled t)
+(use-package json-mode      :ensure t)
 (use-package diminish       :ensure t)
 #+end_src
 
-And then everything else:
+**** Basic
 
 #+begin_src emacs-lisp
-(use-package hydra
-  :ensure t)
-
-(use-package flycheck
-  :disabled t
-  :init (add-hook 'prog-mode-hook 'flycheck-mode)
-  :config (setq-default flycheck-disabled-checkers '(emacs-lisp-checkdoc)))
-
-(use-package expand-region
-  :ensure t
-  :init (global-set-key (kbd "C-=") 'er/expand-region))
-
 (use-package git-gutter-fringe
   :ensure t
   :diminish git-gutter-mode
@@ -80,49 +64,91 @@ And then everything else:
 
 (use-package org-indent                 ; indent text to level of headings 
   :diminish org-indent-mode
-  :init (setq org-startup-indented t))
-
-(use-package calfw
-  :ensure t
-  :config (progn (require 'calfw-org)
-                 (setq cfw:org-overwrite-default-keybinding t)))
+  :init (setq org--indented t))
 
 (use-package magit
   :ensure t)
 
 (use-package edbi
   ;; cpan RPC::EPC::Service DBI DBD::SQLite DBD::mysql
-  :ensure t)
+  :disabled t)
 (use-package edbi-sqlite
-  :ensure t)
+  :disabled t)
 
 (use-package which-key
   :ensure t
   :diminish which-key-mode
   :config (which-key-mode))
+
+(use-package company
+  :ensure t
+  :init (add-hook 'prog-mode-hook 'company-mode))
+
+(use-package yasnippet
+  :ensure t
+  :init (yas-global-mode 1))
+
+(use-package projectile
+  :ensure t)
+(use-package neotree
+  :ensure t
+  :bind ([f12] . neotree-toggle)
+  :init (setq
+         neo-theme (if window-system 'icons 'arrow)
+         neo-smart-open t)
+  :config (progn (evil-define-key 'normal neotree-mode-map (kbd "SPC") 'neotree-enter)
+                 (evil-define-key 'normal neotree-mode-map (kbd "TAB") 'neotree-enter)
+                 (evil-define-key 'normal neotree-mode-map (kbd "RET") 'neotree-enter)))
 #+end_src
 
-Webdev stuff:
+**** Webdev:
 
 #+begin_src emacs-lisp
 (use-package zencoding-mode
+  :disabled t
   :init (add-hook 'sgml-mode-hook 'zencoding-mode))
 
 (use-package web-mode
-  :init (progn
-          (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
-          (add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode))))
+  :ensure t
+  :mode "\\.html\\'")
+
+;; holy moly nice js completion
+;; make sure you install tern via npm (npm install -g tern)
+(use-package tern
+  :ensure t
+  :config (add-hook 'js2-mode-hook (lambda () (tern-mode 1))))
+
+(use-package company-tern
+  :ensure tern
+  :init (add-to-list 'company-backends 'company-tern))
 
 (use-package js2-mode
+  :ensure t
+  :mode "\\.js\\'"
   :init (progn
-          (add-to-list 'auto-mode-alist '("\\.js$" . js2-mode))
+          (setq js2-highlight-level 3)
           (font-lock-add-keywords 'js2-mode
                                   `(("\\(function *\\)("
                                      (0 (progn
-                                          (compose-region (match-beginning 1) (match-end 1) "\u0192")))))))) ; cursive f symbol
+                                          (compose-region (match-beginning 1) (match-end 1) "\u0192")))))))
+  :config (setq tab-width 4))                           ; cursive f symbol
+
+(use-package js2-refactor
+  :ensure t
+  :config (progn
+            (add-hook 'js2-mode-hook #'js2-refactor-mode)
+            (js2r-add-keybindings-with-prefix "C-c r")))
+
+(use-package flymake
+  :ensure t)
+
+(use-package flymake-perlcritic
+  :ensure t
+  ;:mode "\\.pl\\'"
+  :init (setq flymake-perlcritic-severity 3))
 #+end_src
 
-Lisp stuff:
+**** Lisp:
 
 #+begin_src emacs-lisp
 (use-package rainbow-delimiters
@@ -130,16 +156,10 @@ Lisp stuff:
   :init (add-hook 'prog-mode-hook 'rainbow-delimiters-mode))
 
 (use-package paredit
-  :ensure t ; please
+  :ensure t 
   :config (progn
             (add-hook 'lisp-mode-hook 'enable-paredit-mode)
             (add-hook 'emacs-lisp-mode-hook 'enable-paredit-mode)))
-
-(use-package lispy
-  :disabled t
-  :config (progn
-            (add-hook 'lisp-mode-hook (lambda () (lispy-mode 1)))
-            (add-hook 'emacs-lisp-mode-hook (lambda () (lispy-mode 1)))))
 
 (use-package clojure-mode
   :init (add-hook 'clojure-mode-hook 'enable-paredit-mode))
@@ -151,6 +171,7 @@ Lisp stuff:
   :config (cljr-add-keybindings-with-prefix "C-c ."))
 
 (use-package cider
+  :ensure t
   :config (setq cider-repl-result-prefix ";; => ")
   :init (progn
           (add-hook 'cider-repl-mode-hook 'enable-paredit-mode)
@@ -159,34 +180,48 @@ Lisp stuff:
 (use-package smart-tabs-mode
   ;; use tabs for indentation, spaces for alignment.
   :ensure t
-  :config (add-hook 'prog-mode-hook 'smart-tabs-mode))
+  :init (setq-default indent-tabs-mode nil)
+  :config (progn
+            (add-hook 'prog-mode-hook (lambda () (setq indent-tabs-mode t)))
+            (smart-tabs-insinuate 'javascript)))
 
-(use-package helm
-  ;; finally caving to using helm
+(use-package ivy
   :ensure t
-  ;:init (setq helm-buffers-fuzzy-matching nil)
-  :config (progn (helm-mode 1)
-                 (global-set-key (kbd "M-x") 'helm-M-x)
-                 (global-set-key (kbd "C-x C-f") 'helm-find-files)))
+  :config (progn (ivy-mode 1)
+                 (use-package counsel
+                   :ensure t)
+                 (global-set-key (kbd "M-x") 'counsel-M-x)
+                 (global-set-key (kbd "C-x C-f") 'counsel-find-file)))
 
 #+end_src
 
-Vim stuff:
+**** Misc:
 
 #+begin_src emacs-lisp
-(use-package evil-leader
+(use-package lua-mode
   :ensure t
-  :config (progn (evil-leader/set-key
-                   ;; "j" 'avy-goto-char
-                   "k" 'kill-buffer
-                   "b" 'switch-to-buffer
-                   "f" 'find-file
-                   "i" 'indent-buffer
-                   "g" 'magit-status
-                   "<SPC>" 'er/expand-region)
-                 (evil-leader/set-leader "<SPC>")
-                 (global-evil-leader-mode)))
+  :mode "\\.lua\\'")
 
+(use-package whitespace
+  :init (setq whitespace-display-mappings
+              '((newline-mark ?\n    [?¬ ?\n] [?$ ?\n])
+                (space-mark   ?\     [?·]     [?.])
+                (space-mark   ?\xA0  [?¤]     [?_]))
+              whitespace-style '(face trailing tabs spaces newline
+                                      indentation::tab indentation::space indentation
+                                      space-mark tab-mark newline-mark))
+  :config (global-whitespace-mode t))
+
+(use-package elfeed)
+
+(use-package elfeed-org
+  :config (elfeed-org)
+  (setq rmh-elfeed-org-files (list "~/org/elfeed.org")))
+#+end_src
+
+**** Vim:
+
+#+begin_src emacs-lisp
 (use-package evil
   :ensure t
   :config (progn (evil-mode t)
@@ -196,17 +231,19 @@ Vim stuff:
                                                                  (evil-scroll-down nil)))
                  (define-key evil-normal-state-map (kbd "C-k") (lambda ()
                                                                  (interactive)
-                                                                 (evil-scroll-up nil)))))
-
-;; (use-package avy
-;;   :ensure t
-;;   :config (global-set-key (kbd "C-:") 'avy-goto-char))
-
-(use-package evil-snipe
-  ;; default snipe char is s/S, type to letters to swoop to it. s=forward, S=backward
+                                                                 (evil-scroll-up nil)))
+                 (evil-set-initial-state 'elfeed-show-mode 'normal)
+                 (evil-set-initial-state 'elfeed-search-mode 'emacs)))
+(use-package evil-surround
   :ensure t
-  :config (evil-snipe-mode 1))
+  :config (global-evil-surround-mode 1))
+
+(use-package org-evil
+  ; not to be confused with evil-org
+  :ensure t)
 #+end_src
+
+**** Theme
 
 My theme tastes change regularly enough to warrant keeping configuration for old ones:
 
@@ -218,13 +255,6 @@ My theme tastes change regularly enough to warrant keeping configuration for old
           (load-theme 'zenburn 'no-confirm)
           (set-background-color "#282828")
           (set-face-attribute 'region nil :background "#c6d4c5" :foreground "#444")))
-
-(use-package leuven-theme
-  :disabled t
-  :init (progn
-          (load-theme 'leuven 'noconfirm)
-          (set-face-attribute 'org-level-1 nil :height 130)
-          (set-face-attribute 'org-document-title nil :height 140)))
 
 (use-package sanityinc-tomorrow-eighties
   :disabled t
@@ -242,7 +272,9 @@ My theme tastes change regularly enough to warrant keeping configuration for old
                              (powerline-center-evil-theme)
                              (display-time-mode t)))))
 
-
+(use-package all-the-icons
+  ;; be sure to download and install the fonts from https://github.com/domtronn/all-the-icons.el
+  :ensure t)
 #+end_src
 
 *** Misc
@@ -252,32 +284,63 @@ Misc settings that should probably be somewhere else:
 #+begin_src emacs-lisp
 (ido-mode t)
 
+;; in order to execute sh source blocks in org files.
+(require 'ob-sh)
+
 (setq org-log-done t
-      org-agenda-files '("~/org/agenda.org")
       org-edit-src-content-indentation 0
-      org-default-notes-file (concat org-directory "/notes.org")
-      org-src-window-setup 'current-window)
+      org-default-notes-file (concat org-directory "/organiser.org")
+      org-src-window-setup 'current-window
+      org-src-fontify-natively t)
+
+(add-to-list 'org-agenda-files (expand-file-name "~/org/"))
+
+;; stuff done at stupid o'clock counts as 23:59 the previous night
+(setq org-use-effective-time t)
 
 (setq org-capture-templates
-      '(("t" "Todo" entry
-         (file "./todo.org" "Todo")
-         "* TODO %?\nWithin: %^t")
+      '(
+        ("t" "Tasks" entry
+         (file+headline "~/org/organiser.org" "In")
+         "** TODO %^{Task}
+Initialised %<%Y-%m-%d %H:%M>
+%?")
+        ("a" "Appointment" entry
+         (file "./appointments.org" "Appointments")
+         "** TODO %^{Task}
+Booked %<%Y-%m-%d %H:%M>
+%?")
 
         ("i" "Idea" entry
          (file "./ideas.org" "Ideas")
-         "* TODO %?")
+         "* IDEA %?")))
 
-        ("d" "Diary" entry
-         (file "./diary.org" "Diary")
-         "* TODO %?\nAt: %^T")
+(setq org-agenda-custom-commands
+      '(("g" "This fortnight"
+         ((agenda "" ((org-agenda-span 14)))))
 
-        ))
+       ("m" "Next 20 Days"
+        ((agenda "" ((org-agenda-span 20)))))))
+
+(require 'ox-latex)
+(setq org-latex-listings 'minted)
+(setq org-latex-minted-options
+      '(("frame" "lines") ("linenos=true")))
 
 (setq org-tag-alist '(("LEARN" . ?l)
                       ("UNIVERSITY" . ?u)
                       ("URGENT" . ?U)
                       ("PROJECT" . ?p)
                       ("MONEY" . ?$)))
+
+(org-babel-do-load-languages 'org-babel-load-languages
+                             '((plantuml . t)
+                               (python . t)
+                               (js . t)))
+
+
+(setq org-plantuml-jar-path
+      (expand-file-name "~/jars/plantuml.jar"))
 
 (setq nrepl-log-messages t)
 
@@ -287,6 +350,31 @@ Misc settings that should probably be somewhere else:
                                                               (match-end 1)
                                                               "\u03BB")))))) ; lambda symbol
 #+end_src
+
+Perl:
+
+#+begin_src emacs-lisp
+(defalias 'perl-mode 'cperl-mode)
+;; PBP says only use spaces
+
+;; from http://www.perlmonks.org/?node_id=650413
+
+;; (add-to-list 'auto-mode-alist '("\\.\\([pP]\\([Llm]\\|[oO][dD]\\)\\|al
+;; +\\)\\'" . cperl-mode))
+;; (add-to-list 'interpreter-mode-alist '("perl" . cperl-mode))
+;; (add-to-list 'interpreter-mode-alist '("perl5" . cperl-mode))
+;; (add-to-list 'interpreter-mode-alist '("miniperl" . cperl-mode))
+
+(custom-set-variables
+  '(cperl-close-paren-offset -4)
+  '(cperl-continued-statement-offset 4)
+  '(cperl-indent-level 4)
+  '(cperl-indent-parens-as-block t)
+  '(cperl-tab-always-indent t)
+  ;; my changes:
+  '(cperl-array-face ((t nil))))
+#+end_src
+
 
 *** Fonts
 
@@ -298,6 +386,9 @@ Other fonts I like include (in no particular order) Inconsolata, Consolas, Droid
 [[http://larsenwork.com/monoid/][Monoid]] seems cool, if a little edgy.
 
 #+begin_src emacs-lisp
+(set-face-attribute 'default nil
+                    :family "Source Code Pro"
+                    :height 105 :weight 'medium)
 (set-face-attribute 'default nil
                     :family "Fira Mono"
                     :height 105 :weight 'medium)
@@ -354,6 +445,13 @@ to turn into a header.
   "Indent the entire buffer."
   (interactive)
   (indent-region (point-min) (point-max)))
+
+(defun my-agenda ()
+   "Refresh agenda files every time before we open our agenda."
+   (interactive)
+   (progn
+     (add-to-list 'org-agenda-files (expand-file-name "~/org/"))
+     (org-agenda)))
 #+end_src
 
 ** Keybindings
@@ -363,11 +461,13 @@ section. Keeps the bindings with their package so they're easily found and chang
 
 #+begin_src emacs-lisp
 (global-set-key (kbd "C-c C-d") 'delete-trailing-whitespace)
+(global-set-key (kbd "C-c a") 'my-agenda)
+(global-set-key (kbd "C-c r") 'org-capture)
+(global-set-key (kbd "C-c l") 'org-store-link)
+
+;; these shouldnt be global.
 (global-set-key (kbd "C-c C-,") 'org-promote-subtree)
 (global-set-key (kbd "C-c C-.") 'org-demote-subtree)
-(global-set-key (kbd "C-c a") 'org-agenda)
-(global-set-key (kbd "C-c c") 'org-capture)
-
 
 (global-unset-key (kbd "C-z"))
 
@@ -383,7 +483,7 @@ General, built-in settings for Emacs.
 (dolist (mode '(menu-bar-mode scroll-bar-mode tool-bar-mode))
   (when (fboundp mode) (funcall mode -1)))
 
-;; vimmy scrolling
+;; Vimmy scrolling
 (setq scroll-margin 8
       scroll-step 1
       scroll-conservatively 101)
@@ -404,12 +504,13 @@ General, built-in settings for Emacs.
 ;; disable the splash screen
 (setq inhibit-splash-screen t)
 
-;; use spaces, not tabs!
-(setq-default indent-tabs-mode nil)
-(setq tab-width 4)
+(setq-default tab-width 2)
 
 ;; display line numbers only when programming
 (add-hook 'prog-mode-hook (lambda () (linum-mode 1)))
+
+;; word wrap when in org mode
+(add-hook 'org-mode-hook (lambda () (visual-line-mode t)))
 
 ;; fix minor annoyances
 (fset 'yes-or-no-p 'y-or-n-p)
