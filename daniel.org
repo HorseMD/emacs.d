@@ -16,6 +16,8 @@ I like to keep a directory in =~/.emacs.d= to throw things in to be put in Emacs
 
 *** Add package sources
 
+Most packages we use are on melpa:
+
 #+begin_src emacs-lisp
 ;; add the repos
 (setq package-archives '(("gnu" . "http://elpa.gnu.org/packages/")
@@ -26,6 +28,7 @@ I like to keep a directory in =~/.emacs.d= to throw things in to be put in Emacs
 #+end_src
 
 ** Custom Packages
+*** Setup
 
 Let's use use-package!
 
@@ -52,6 +55,7 @@ that require no configuration (other than maybe an ensure):
 #+begin_src emacs-lisp
 (use-package json-mode      :ensure t)
 (use-package diminish       :ensure t)
+(use-package magit          :ensure t)
 #+end_src
 
 **** Basic
@@ -65,9 +69,6 @@ that require no configuration (other than maybe an ensure):
 (use-package org-indent                 ; indent text to level of headings 
   :diminish org-indent-mode
   :init (setq org--indented t))
-
-(use-package magit
-  :ensure t)
 
 (use-package edbi
   ;; cpan RPC::EPC::Service DBI DBD::SQLite DBD::mysql
@@ -99,6 +100,10 @@ that require no configuration (other than maybe an ensure):
   :config (progn (evil-define-key 'normal neotree-mode-map (kbd "SPC") 'neotree-enter)
                  (evil-define-key 'normal neotree-mode-map (kbd "TAB") 'neotree-enter)
                  (evil-define-key 'normal neotree-mode-map (kbd "RET") 'neotree-enter)))
+
+(use-package lua-mode
+  :ensure t
+  :mode "\\.lua\\'")
 #+end_src
 
 **** Webdev:
@@ -176,7 +181,11 @@ that require no configuration (other than maybe an ensure):
   :init (progn
           (add-hook 'cider-repl-mode-hook 'enable-paredit-mode)
           (add-hook 'cider-mode-hook #'eldoc-mode)))
+#+end_src
 
+**** Misc:
+
+#+begin_src emacs-lisp
 (use-package smart-tabs-mode
   ;; use tabs for indentation, spaces for alignment.
   :ensure t
@@ -193,15 +202,6 @@ that require no configuration (other than maybe an ensure):
                  (global-set-key (kbd "M-x") 'counsel-M-x)
                  (global-set-key (kbd "C-x C-f") 'counsel-find-file)))
 
-#+end_src
-
-**** Misc:
-
-#+begin_src emacs-lisp
-(use-package lua-mode
-  :ensure t
-  :mode "\\.lua\\'")
-
 (use-package whitespace
   :init (setq whitespace-display-mappings
               '((newline-mark ?\n    [?¬ ?\n] [?$ ?\n])
@@ -213,7 +213,8 @@ that require no configuration (other than maybe an ensure):
   :config (global-whitespace-mode t))
 
 (use-package elfeed)
-
+(use-package elfeed-goodies
+	:config (elfeed-goodies/setup))
 (use-package elfeed-org
   :config (elfeed-org)
   (setq rmh-elfeed-org-files (list "~/org/elfeed.org")))
@@ -234,6 +235,7 @@ that require no configuration (other than maybe an ensure):
                                                                  (evil-scroll-up nil)))
                  (evil-set-initial-state 'elfeed-show-mode 'normal)
                  (evil-set-initial-state 'elfeed-search-mode 'emacs)))
+
 (use-package evil-surround
   :ensure t
   :config (global-evil-surround-mode 1))
@@ -277,13 +279,9 @@ My theme tastes change regularly enough to warrant keeping configuration for old
   :ensure t)
 #+end_src
 
-*** Misc
-
-Misc settings that should probably be somewhere else:
+**** Org
 
 #+begin_src emacs-lisp
-(ido-mode t)
-
 ;; in order to execute sh source blocks in org files.
 (require 'ob-sh)
 
@@ -338,9 +336,15 @@ Booked %<%Y-%m-%d %H:%M>
                                (python . t)
                                (js . t)))
 
-
 (setq org-plantuml-jar-path
       (expand-file-name "~/jars/plantuml.jar"))
+#+end_src
+
+*** Misc
+Misc settings that should probably be somewhere else:
+
+#+begin_src emacs-lisp
+(ido-mode t)
 
 (setq nrepl-log-messages t)
 
@@ -351,7 +355,7 @@ Booked %<%Y-%m-%d %H:%M>
                                                               "\u03BB")))))) ; lambda symbol
 #+end_src
 
-Perl:
+*** Perl
 
 #+begin_src emacs-lisp
 (defalias 'perl-mode 'cperl-mode)
@@ -374,7 +378,6 @@ Perl:
   ;; my changes:
   '(cperl-array-face ((t nil))))
 #+end_src
-
 
 *** Fonts
 
@@ -404,16 +407,17 @@ this section is for the configuration of those sorts of things, based on the exi
 of those binaries.
 
 #+begin_src emacs-lisp
-;; git clone https://github.com/slime/slime.git ~/.emacs.d/git/slime/
-(when (executable-find "clisp")
-  (add-to-list 'load-path "~/.emacs.d/git/slime")
-  (require 'slime-autoloads)
-  (setq inferior-lisp-program (executable-find "clisp"))
-  (setq slime-contribs '(slime-fancy)))
+;; ;; git clone https://github.com/slime/slime.git ~/.emacs.d/git/slime/
+;; (when (executable-find "clisp")
+;;   (add-to-list 'load-path "~/.emacs.d/git/slime")
+;;   (require 'slime-autoloads)
+;;   (setq inferior-lisp-program (executable-find "clisp"))
+;;   (setq slime-contribs '(slime-fancy)))
 
 (when (executable-find "pandoc")
   (setq markdown-command "pandoc -f markdown -t html"))
 #+end_src
+
 ** Code
 
 Create a code header from the current line. Usage: call =my-comment-header= on the line you want
