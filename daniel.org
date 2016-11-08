@@ -66,10 +66,6 @@ that require no configuration (other than maybe an ensure):
   :diminish git-gutter-mode
   :config (global-git-gutter-mode 1))
 
-(use-package org-indent                 ; indent text to level of headings 
-  :diminish org-indent-mode
-  :init (setq org--indented t))
-
 (use-package edbi
   ;; cpan RPC::EPC::Service DBI DBD::SQLite DBD::mysql
   :disabled t)
@@ -106,7 +102,7 @@ that require no configuration (other than maybe an ensure):
   :mode "\\.lua\\'")
 #+end_src
 
-**** Webdev:
+**** Webdev
 
 #+begin_src emacs-lisp
 (use-package zencoding-mode
@@ -153,7 +149,7 @@ that require no configuration (other than maybe an ensure):
   :init (setq flymake-perlcritic-severity 3))
 #+end_src
 
-**** Lisp:
+**** Lisp
 
 #+begin_src emacs-lisp
 (use-package rainbow-delimiters
@@ -183,7 +179,7 @@ that require no configuration (other than maybe an ensure):
           (add-hook 'cider-mode-hook #'eldoc-mode)))
 #+end_src
 
-**** Misc:
+**** Misc
 
 #+begin_src emacs-lisp
 (use-package smart-tabs-mode
@@ -220,7 +216,7 @@ that require no configuration (other than maybe an ensure):
   (setq rmh-elfeed-org-files (list "~/org/elfeed.org")))
 #+end_src
 
-**** Vim:
+**** Vim
 
 #+begin_src emacs-lisp
 (use-package evil
@@ -515,6 +511,8 @@ General, built-in settings for Emacs.
 
 ;; word wrap when in org mode
 (add-hook 'org-mode-hook (lambda () (visual-line-mode t)))
+
+(add-hook 'org-mode-hook (lambda () (org-indent-mode)))
 
 ;; fix minor annoyances
 (fset 'yes-or-no-p 'y-or-n-p)
