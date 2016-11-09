@@ -277,9 +277,30 @@ My theme tastes change regularly enough to warrant keeping configuration for old
 
 **** Org
 
+Some helper functions to get nice agenda-views:
+
+#+begin_src emacs-lisp
+(defun my-dayn-of-week ()
+	"Get the numeric representation of the current day. Mon = 0, Sun = 7"
+	(let ((day (string-to-number (format-time-string "%u"))))
+		day))
+
+(defun my-+weekday-remainder (days)
+	"Get the number of days plus the rest-of-the-week. Defaults to a week."
+	(let* ((day (my-dayn-of-week))
+				 (remain (- 7 day)))
+		(+ (or days 7) remain)))
+#+end_src
+
+And the rest of the settings:
+
 #+begin_src emacs-lisp
 ;; in order to execute sh source blocks in org files.
 (require 'ob-sh)
+
+;; Org-mode related hooks
+(add-hook 'org-mode-hook (lambda () (visual-line-mode t)))
+(add-hook 'org-mode-hook (lambda () (org-indent-mode)))
 
 (setq org-log-done t
       org-edit-src-content-indentation 0
@@ -295,9 +316,8 @@ My theme tastes change regularly enough to warrant keeping configuration for old
 (setq org-capture-templates
       '(
         ("t" "Tasks" entry
-         (file+headline "~/org/organiser.org" "In")
+         (file+headline "~/org/organiser.org" "Organiser")
          "** TODO %^{Task}
-Initialised %<%Y-%m-%d %H:%M>
 %?")
         ("a" "Appointment" entry
          (file "./appointments.org" "Appointments")
@@ -310,11 +330,10 @@ Booked %<%Y-%m-%d %H:%M>
          "* IDEA %?")))
 
 (setq org-agenda-custom-commands
-      '(("g" "This fortnight"
-         ((agenda "" ((org-agenda-span 14)))))
-
-       ("m" "Next 20 Days"
-        ((agenda "" ((org-agenda-span 20)))))))
+      '(("g" "This fortnight" agenda ""
+				 ((org-agenda-span (my-+weekday-remainder 14))))
+				("m" "Next 28-ish Days" agenda ""
+				 ((org-agenda-span (my-+weekday-remainder 28))))))
 
 (require 'ox-latex)
 (setq org-latex-listings 'minted)
@@ -323,9 +342,8 @@ Booked %<%Y-%m-%d %H:%M>
 
 (setq org-tag-alist '(("LEARN" . ?l)
                       ("UNIVERSITY" . ?u)
-                      ("URGENT" . ?U)
-                      ("PROJECT" . ?p)
-                      ("MONEY" . ?$)))
+                      ("FUN" . ?f)
+                      ("PROJECT" . ?p)))
 
 (org-babel-do-load-languages 'org-babel-load-languages
                              '((plantuml . t)
@@ -445,13 +463,6 @@ to turn into a header.
   "Indent the entire buffer."
   (interactive)
   (indent-region (point-min) (point-max)))
-
-(defun my-agenda ()
-   "Refresh agenda files every time before we open our agenda."
-   (interactive)
-   (progn
-     (add-to-list 'org-agenda-files (expand-file-name "~/org/"))
-     (org-agenda)))
 #+end_src
 
 ** Keybindings
@@ -461,7 +472,7 @@ section. Keeps the bindings with their package so they're easily found and chang
 
 #+begin_src emacs-lisp
 (global-set-key (kbd "C-c C-d") 'delete-trailing-whitespace)
-(global-set-key (kbd "C-c a") 'my-agenda)
+(global-set-key (kbd "C-c a") 'org-agenda)
 (global-set-key (kbd "C-c r") 'org-capture)
 (global-set-key (kbd "C-c l") 'org-store-link)
 
@@ -508,11 +519,6 @@ General, built-in settings for Emacs.
 
 ;; display line numbers only when programming
 (add-hook 'prog-mode-hook (lambda () (linum-mode 1)))
-
-;; word wrap when in org mode
-(add-hook 'org-mode-hook (lambda () (visual-line-mode t)))
-
-(add-hook 'org-mode-hook (lambda () (org-indent-mode)))
 
 ;; fix minor annoyances
 (fset 'yes-or-no-p 'y-or-n-p)
