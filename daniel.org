@@ -496,6 +496,8 @@ section. Keeps the bindings with their package so they're easily found and chang
 (global-set-key (kbd "C-c C-,") 'org-promote-subtree)
 (global-set-key (kbd "C-c C-.") 'org-demote-subtree)
 
+(global-set-key (kbd "<f10>") 'magit-status)
+
 (global-unset-key (kbd "C-z"))
 
 (global-set-key (kbd "C-c h") 'my-comment-header)
