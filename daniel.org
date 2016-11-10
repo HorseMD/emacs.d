@@ -292,6 +292,22 @@ Some helper functions to get nice agenda-views:
 		(+ (or days 7) remain)))
 #+end_src
 
+I tend to store a lot of links, so I like this to be automated.
+
+#+begin_src emacs-lisp
+(defun my-get-clipboard-contents ()
+	(with-temp-buffer
+		(yank)
+		(buffer-string)))
+
+(defun my-insert-org-link ()
+	(interactive)
+	(progn (let* ((link (my-get-clipboard-contents))
+								(reference (read-string "URL Placeholder: "))
+								(my-org-link (format "[[%s][%s]]" link reference) ))
+					 (insert my-org-link))))
+#+end_src
+
 And the rest of the settings:
 
 #+begin_src emacs-lisp
@@ -474,7 +490,7 @@ section. Keeps the bindings with their package so they're easily found and chang
 (global-set-key (kbd "C-c C-d") 'delete-trailing-whitespace)
 (global-set-key (kbd "C-c a") 'org-agenda)
 (global-set-key (kbd "C-c r") 'org-capture)
-(global-set-key (kbd "C-c l") 'org-store-link)
+(global-set-key (kbd "C-c l") 'my-insert-org-link)
 
 ;; these shouldnt be global.
 (global-set-key (kbd "C-c C-,") 'org-promote-subtree)
