@@ -184,7 +184,7 @@ that require no configuration (other than maybe an ensure):
 #+begin_src emacs-lisp
 (use-package smart-tabs-mode
   ;; use tabs for indentation, spaces for alignment.
-  :ensure t
+  :disabled t
   :init (setq-default indent-tabs-mode nil)
   :config (progn
             (add-hook 'prog-mode-hook (lambda () (setq indent-tabs-mode t)))
@@ -319,10 +319,11 @@ And the rest of the settings:
 (add-hook 'org-mode-hook (lambda () (org-indent-mode)))
 
 (setq org-log-done t
-      org-edit-src-content-indentation 0
-      org-default-notes-file (concat org-directory "/organiser.org")
-      org-src-window-setup 'current-window
-      org-src-fontify-natively t)
+			org-edit-src-content-indentation 0
+			org-default-notes-file (concat org-directory "/organiser.org")
+			org-src-window-setup 'current-window
+			org-src-fontify-natively t
+			org-src-tab-acts-natively t)
 
 (add-to-list 'org-agenda-files (expand-file-name "~/org/"))
 
@@ -330,23 +331,22 @@ And the rest of the settings:
 (setq org-use-effective-time t)
 
 (setq org-capture-templates
-      '(
-        ("t" "Tasks" entry
-         (file+headline "~/org/organiser.org" "Organiser")
-         "** TODO %^{Task}
+			'(("t" "Tasks" entry
+				 (file+headline "~/org/organiser.org" "Organiser")
+				 "** TODO %^{Task}
 %?")
-        ("a" "Appointment" entry
+				("a" "Appointment" entry
          (file "./appointments.org" "Appointments")
          "** TODO %^{Task}
 Booked %<%Y-%m-%d %H:%M>
 %?")
 
-        ("i" "Idea" entry
-         (file "./ideas.org" "Ideas")
-         "* IDEA %?")))
+				("i" "Idea" entry
+				 (file "./ideas.org" "Ideas")
+				 "* IDEA %?")))
 
 (setq org-agenda-custom-commands
-      '(("g" "This fortnight" agenda ""
+			'(("g" "This fortnight" agenda ""
 				 ((org-agenda-span (my-+weekday-remainder 14))))
 				("m" "Next 28-ish Days" agenda ""
 				 ((org-agenda-span (my-+weekday-remainder 28))))))
@@ -354,20 +354,20 @@ Booked %<%Y-%m-%d %H:%M>
 (require 'ox-latex)
 (setq org-latex-listings 'minted)
 (setq org-latex-minted-options
-      '(("frame" "lines") ("linenos=true")))
+			'(("frame" "lines") ("linenos=true")))
 
 (setq org-tag-alist '(("LEARN" . ?l)
-                      ("UNIVERSITY" . ?u)
-                      ("FUN" . ?f)
-                      ("PROJECT" . ?p)))
+											("UNIVERSITY" . ?u)
+											("FUN" . ?f)
+											("PROJECT" . ?p)))
 
 (org-babel-do-load-languages 'org-babel-load-languages
-                             '((plantuml . t)
-                               (python . t)
-                               (js . t)))
+														 '((plantuml . t)
+															 (python . t)
+															 (js . t)))
 
 (setq org-plantuml-jar-path
-      (expand-file-name "~/jars/plantuml.jar"))
+			(expand-file-name "~/jars/plantuml.jar"))
 #+end_src
 
 *** Misc
@@ -517,6 +517,10 @@ General, built-in settings for Emacs.
 
 ;; no wrap
 (setq-default truncate-lines t)
+
+;; indentation
+(setq-default indent-tabs-mode nil
+							tab-width 4)
 
 ;; show matching parentheses
 (show-paren-mode 1)
