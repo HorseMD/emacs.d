@@ -281,31 +281,31 @@ Some helper functions to get nice agenda-views:
 
 #+begin_src emacs-lisp
 (defun my-dayn-of-week ()
-	"Get the numeric representation of the current day. Mon = 0, Sun = 7"
-	(let ((day (string-to-number (format-time-string "%u"))))
-		day))
+  "Get the numeric representation of the current day. Mon = 0, Sun = 7"
+  (let ((day (string-to-number (format-time-string "%u"))))
+    day))
 
 (defun my-+weekday-remainder (days)
-	"Get the number of days plus the rest-of-the-week. Defaults to a week."
-	(let* ((day (my-dayn-of-week))
-				 (remain (- 7 day)))
-		(+ (or days 7) remain)))
+  "Get the number of days plus the rest-of-the-week. Defaults to a week."
+  (let* ((day (my-dayn-of-week))
+         (remain (- 7 day)))
+    (+ (or days 7) remain)))
 #+end_src
 
 I tend to store a lot of links, so I like this to be automated.
 
 #+begin_src emacs-lisp
 (defun my-get-clipboard-contents ()
-	(with-temp-buffer
-		(yank)
-		(buffer-string)))
+  (with-temp-buffer
+    (yank)
+    (buffer-string)))
 
 (defun my-insert-org-link ()
-	(interactive)
-	(progn (let* ((link (my-get-clipboard-contents))
-								(reference (read-string "URL Placeholder: "))
-								(my-org-link (format "[[%s][%s]]" link reference) ))
-					 (insert my-org-link))))
+  (interactive)
+  (progn (let* ((link (my-get-clipboard-contents))
+                (reference (read-string "URL Placeholder: "))
+                (my-org-link (format "[[%s][%s]]" link reference) ))
+           (insert my-org-link))))
 #+end_src
 
 And the rest of the settings:
@@ -319,11 +319,11 @@ And the rest of the settings:
 (add-hook 'org-mode-hook (lambda () (org-indent-mode)))
 
 (setq org-log-done t
-			org-edit-src-content-indentation 0
-			org-default-notes-file (concat org-directory "/organiser.org")
-			org-src-window-setup 'current-window
-			org-src-fontify-natively t
-			org-src-tab-acts-natively t)
+      org-edit-src-content-indentation 0
+      org-default-notes-file (concat org-directory "/organiser.org")
+      org-src-window-setup 'current-window
+      org-src-fontify-natively t
+      org-src-tab-acts-natively t)
 
 (add-to-list 'org-agenda-files (expand-file-name "~/org/"))
 
@@ -331,43 +331,43 @@ And the rest of the settings:
 (setq org-use-effective-time t)
 
 (setq org-capture-templates
-			'(("t" "Tasks" entry
-				 (file+headline "~/org/organiser.org" "Organiser")
-				 "** TODO %^{Task}
+      '(("t" "Tasks" entry
+         (file+headline "~/org/organiser.org" "Organiser")
+         "** TODO %^{Task}
 %?")
-				("a" "Appointment" entry
+        ("a" "Appointment" entry
          (file "./appointments.org" "Appointments")
          "** TODO %^{Task}
 Booked %<%Y-%m-%d %H:%M>
 %?")
 
-				("i" "Idea" entry
-				 (file "./ideas.org" "Ideas")
-				 "* IDEA %?")))
+        ("i" "Idea" entry
+         (file "./ideas.org" "Ideas")
+         "* IDEA %?")))
 
 (setq org-agenda-custom-commands
-			'(("g" "This fortnight" agenda ""
-				 ((org-agenda-span (my-+weekday-remainder 14))))
-				("m" "Next 28-ish Days" agenda ""
-				 ((org-agenda-span (my-+weekday-remainder 28))))))
+      '(("g" "This fortnight" agenda ""
+         ((org-agenda-span (my-+weekday-remainder 14))))
+        ("m" "Next 28-ish Days" agenda ""
+         ((org-agenda-span (my-+weekday-remainder 28))))))
 
 (require 'ox-latex)
 (setq org-latex-listings 'minted)
 (setq org-latex-minted-options
-			'(("frame" "lines") ("linenos=true")))
+      '(("frame" "lines") ("linenos=true")))
 
 (setq org-tag-alist '(("LEARN" . ?l)
-											("UNIVERSITY" . ?u)
-											("FUN" . ?f)
-											("PROJECT" . ?p)))
+                      ("UNIVERSITY" . ?u)
+                      ("FUN" . ?f)
+                      ("PROJECT" . ?p)))
 
 (org-babel-do-load-languages 'org-babel-load-languages
-														 '((plantuml . t)
-															 (python . t)
-															 (js . t)))
+                             '((plantuml . t)
+                               (python . t)
+                               (js . t)))
 
 (setq org-plantuml-jar-path
-			(expand-file-name "~/jars/plantuml.jar"))
+      (expand-file-name "~/jars/plantuml.jar"))
 #+end_src
 
 *** Misc
