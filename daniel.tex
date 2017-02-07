@@ -1,66 +1,105 @@
-#+TITLE: Emacs Configuration File
+% Created 2016-12-09 Fri 16:25
+\documentclass[11pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{fixltx2e}
+\usepackage{graphicx}
+\usepackage{longtable}
+\usepackage{float}
+\usepackage{wrapfig}
+\usepackage{rotating}
+\usepackage[normalem]{ulem}
+\usepackage{amsmath}
+\usepackage{textcomp}
+\usepackage{marvosym}
+\usepackage{wasysym}
+\usepackage{amssymb}
+\usepackage{hyperref}
+\tolerance=1000
+\usepackage{minted}
+\author{user}
+\date{\today}
+\title{Emacs Configuration File}
+\hypersetup{
+  pdfkeywords={},
+  pdfsubject={},
+  pdfcreator={Emacs 24.4.1 (Org mode 8.2.10)}}
+\begin{document}
 
-* Configuration
+\maketitle
+\tableofcontents
 
-Essentially this file takes the place of my original =init.el= file. That file is now only
-used to load /this/ file, via =org-babel-load-file=.
 
-** Setup
-*** Add directories
+\section{Configuration}
+\label{sec-1}
 
-I like to keep a directory in =~/.emacs.d= to throw things in to be put in Emacs's load path.
+Essentially this file takes the place of my original \texttt{init.el} file. That file is now only
+used to load \emph{this} file, via \texttt{org-babel-load-file}.
 
-#+begin_src emacs-lisp
+\subsection{Setup}
+\label{sec-1-1}
+\subsubsection{Add directories}
+\label{sec-1-1-1}
+
+I like to keep a directory in \texttt{\textasciitilde{}/.emacs.d} to throw things in to be put in Emacs's load path.
+
+\begin{minted}[frame=single,linenos=false,breaklines=true,resetmargins=true,samepage=true,fontsize=\footnotesize]{common-lisp}
 (add-to-list 'load-path "~/.emacs.d/autoload")
-#+end_src
+\end{minted}
 
-*** Add package sources
+\subsubsection{Add package sources}
+\label{sec-1-1-2}
 
 Most packages we use are on melpa:
 
-#+begin_src emacs-lisp
+\begin{minted}[frame=single,linenos=false,breaklines=true,resetmargins=true,samepage=true,fontsize=\footnotesize]{common-lisp}
 ;; add the repos
 (setq package-archives '(("gnu" . "http://elpa.gnu.org/packages/")
                          ("marmalade" . "http://marmalade-repo.org/packages/")
                          ("melpa" . "http://melpa.org/packages/")))
 
 (package-initialize)
-#+end_src
+\end{minted}
 
-** Custom Packages
-*** Setup
+\subsection{Custom Packages}
+\label{sec-1-2}
+\subsubsection{Setup}
+\label{sec-1-2-1}
 
 Let's use use-package!
 
-#+begin_src emacs-lisp
+\begin{minted}[frame=single,linenos=false,breaklines=true,resetmargins=true,samepage=true,fontsize=\footnotesize]{common-lisp}
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
   (package-install 'use-package))
 
 (eval-when-compile
   (require 'use-package))
-#+end_src
+\end{minted}
 
 Just in case we're from the past, let's prefer UTF-8 before we do anything else.
 
-#+begin_src emacs-lisp
+\begin{minted}[frame=single,linenos=false,breaklines=true,resetmargins=true,samepage=true,fontsize=\footnotesize]{common-lisp}
 (prefer-coding-system 'utf-8)
-#+end_src
+\end{minted}
 
-*** Install
+\subsubsection{Install}
+\label{sec-1-2-2}
 
-With =use-package=, we can easily and cleanly organise and configure plugins. First a few packages
+With \texttt{use-package}, we can easily and cleanly organise and configure plugins. First a few packages
 that require no configuration (other than maybe an ensure):
 
-#+begin_src emacs-lisp
+\begin{minted}[frame=single,linenos=false,breaklines=true,resetmargins=true,samepage=true,fontsize=\footnotesize]{common-lisp}
 (use-package json-mode      :ensure t)
 (use-package diminish       :ensure t)
 (use-package magit          :ensure t)
-#+end_src
+\end{minted}
 
-**** Basic
+\begin{enumerate}
+\item Basic
+\label{sec-1-2-2-1}
 
-#+begin_src emacs-lisp
+\begin{minted}[frame=single,linenos=false,breaklines=true,resetmargins=true,samepage=true,fontsize=\footnotesize]{common-lisp}
 (use-package git-gutter-fringe
   :ensure t
   :diminish git-gutter-mode
@@ -79,21 +118,16 @@ that require no configuration (other than maybe an ensure):
 
 (use-package company
   :ensure t
-  :init (progn
-          (add-hook 'prog-mode-hook 'company-mode)
-          (setq company-tooltip-align-annotations t)))
+  :init (add-hook 'prog-mode-hook 'company-mode))
 
 (use-package yasnippet
   :ensure t
   :init (yas-global-mode 1))
 
 (use-package projectile
-  :ensure t
-  :config (progn (use-package counsel-projectile
-                   :ensure t
-                   :config (counsel-projectile-on))))
-
+  :ensure t)
 (use-package neotree
+  :ensure t
   :bind ([f12] . neotree-toggle)
   :init (setq
          neo-theme (if window-system 'icons 'arrow)
@@ -103,17 +137,14 @@ that require no configuration (other than maybe an ensure):
                  (evil-define-key 'normal neotree-mode-map (kbd "RET") 'neotree-enter)))
 
 (use-package lua-mode
-  :mode "\\.lua\\'")
-
-(use-package fuel
   :ensure t
-  :init (setq fuel-listener-factor-binary "/home/user/bin/factor/factor"
-              fuel-listener-factor-image "/home/user/bin/factor/factor.image"))
-#+end_src
+  :mode "\\.lua\\'")
+\end{minted}
 
-**** Webdev
+\item Webdev
+\label{sec-1-2-2-2}
 
-#+begin_src emacs-lisp
+\begin{minted}[frame=single,linenos=false,breaklines=true,resetmargins=true,samepage=true,fontsize=\footnotesize]{common-lisp}
 (use-package zencoding-mode
   :disabled t
   :init (add-hook 'sgml-mode-hook 'zencoding-mode))
@@ -156,23 +187,12 @@ that require no configuration (other than maybe an ensure):
   :ensure t
   ;:mode "\\.pl\\'"
   :init (setq flymake-perlcritic-severity 3))
+\end{minted}
 
-(defun init-tide ()
-  (interactive)
-  (tide-setup)
-  (flymake-mode 1)
-  (eldoc-mode 1)
-  (tide-hl-identifier-mode 1))
+\item Lisp
+\label{sec-1-2-2-3}
 
-(use-package tide
-  :init (progn
-          (add-hook 'before-save-hook 'tide-format-before-save)
-          (add-hook 'typescript-mode-hook #'init-tide)))
-#+end_src
-
-**** Lisp
-
-#+begin_src emacs-lisp
+\begin{minted}[frame=single,linenos=false,breaklines=true,resetmargins=true,samepage=true,fontsize=\footnotesize]{common-lisp}
 (use-package rainbow-delimiters
   :ensure t
   :init (add-hook 'prog-mode-hook 'rainbow-delimiters-mode))
@@ -198,11 +218,12 @@ that require no configuration (other than maybe an ensure):
   :init (progn
           (add-hook 'cider-repl-mode-hook 'enable-paredit-mode)
           (add-hook 'cider-mode-hook #'eldoc-mode)))
-#+end_src
+\end{minted}
 
-**** Misc
+\item Misc
+\label{sec-1-2-2-4}
 
-#+begin_src emacs-lisp
+\begin{minted}[frame=single,linenos=false,breaklines=true,resetmargins=true,samepage=true,fontsize=\footnotesize]{common-lisp}
 (use-package smart-tabs-mode
   ;; use tabs for indentation, spaces for alignment.
   :disabled t
@@ -220,7 +241,6 @@ that require no configuration (other than maybe an ensure):
                  (global-set-key (kbd "C-x C-f") 'counsel-find-file)))
 
 (use-package whitespace
-  :disabled t
   :init (setq whitespace-display-mappings
               '((newline-mark ?\n    [?¬ ?\n] [?$ ?\n])
                 (space-mark   ?\     [?·]     [?.])
@@ -233,20 +253,18 @@ that require no configuration (other than maybe an ensure):
 (use-package org-ref
   :init (setq org-ref-default-citation-link "autocite"))
 
-(use-package evil-quickscope
-  :init (add-hook 'prog-mode-hook 'turn-on-evil-quickscope-always-mode))
-
 (use-package elfeed)
 (use-package elfeed-goodies
   :config (elfeed-goodies/setup))
 (use-package elfeed-org
   :config (elfeed-org)
   (setq rmh-elfeed-org-files (list "~/org/elfeed.org")))
-#+end_src
+\end{minted}
 
-**** Vim
+\item Vim
+\label{sec-1-2-2-5}
 
-#+begin_src emacs-lisp
+\begin{minted}[frame=single,linenos=false,breaklines=true,resetmargins=true,samepage=true,fontsize=\footnotesize]{common-lisp}
 (use-package evil
   :ensure t
   :config (progn (evil-mode t)
@@ -267,13 +285,14 @@ that require no configuration (other than maybe an ensure):
 (use-package org-evil
   ; not to be confused with evil-org
   :ensure t)
-#+end_src
+\end{minted}
 
-**** Theme
+\item Theme
+\label{sec-1-2-2-6}
 
 My theme tastes change regularly enough to warrant keeping configuration for old ones:
 
-#+begin_src emacs-lisp
+\begin{minted}[frame=single,linenos=false,breaklines=true,resetmargins=true,samepage=true,fontsize=\footnotesize]{common-lisp}
 (use-package zenburn
   :disabled t
   :ensure zenburn-theme
@@ -287,7 +306,7 @@ My theme tastes change regularly enough to warrant keeping configuration for old
   :init (load-theme 'sanityinc-tomorrow-eighties 'no-confirm))
 
 (use-package moe-theme
-  :disabled t
+  :ensure t
   :config (progn (moe-theme-set-color 'magenta)
                  (moe-light)
                  (use-package powerline
@@ -298,13 +317,6 @@ My theme tastes change regularly enough to warrant keeping configuration for old
                              (powerline-center-evil-theme)
                              (display-time-mode t)))))
 
-(use-package dracula-theme
-  :config (use-package powerline
-            :ensure t
-            :config (progn
-                      (powerline-center-evil-theme)
-                      (display-time-mode t))))
-
 (use-package apropospriate-theme
   :disabled t
   :init (progn
@@ -313,13 +325,14 @@ My theme tastes change regularly enough to warrant keeping configuration for old
 (use-package all-the-icons
   ;; be sure to download and install the fonts from https://github.com/domtronn/all-the-icons.el
   :ensure t)
-#+end_src
+\end{minted}
 
-**** Org
+\item Org
+\label{sec-1-2-2-7}
 
 Some helper functions to get nice agenda-views:
 
-#+begin_src emacs-lisp
+\begin{minted}[frame=single,linenos=false,breaklines=true,resetmargins=true,samepage=true,fontsize=\footnotesize]{common-lisp}
 (defun my-dayn-of-week ()
   "Get the numeric representation of the current day. Mon = 0, Sun = 7"
   (let ((day (string-to-number (format-time-string "%u"))))
@@ -330,11 +343,11 @@ Some helper functions to get nice agenda-views:
   (let* ((day (my-dayn-of-week))
          (remain (- 7 day)))
     (+ (or days 7) remain)))
-#+end_src
+\end{minted}
 
 I tend to store a lot of links, so I like this to be automated.
 
-#+begin_src emacs-lisp
+\begin{minted}[frame=single,linenos=false,breaklines=true,resetmargins=true,samepage=true,fontsize=\footnotesize]{common-lisp}
 (defun my-get-clipboard-contents ()
   (with-temp-buffer
     (yank)
@@ -346,11 +359,11 @@ I tend to store a lot of links, so I like this to be automated.
                 (reference (read-string "URL Placeholder: "))
                 (my-org-link (format "[[%s][%s]]" link reference) ))
            (insert my-org-link))))
-#+end_src
+\end{minted}
 
 And the rest of the settings:
 
-#+begin_src emacs-lisp
+\begin{minted}[frame=single,linenos=false,breaklines=true,resetmargins=true,samepage=true,fontsize=\footnotesize]{common-lisp}
 ;; in order to execute sh source blocks in org files.
 (require 'ob-sh)
 
@@ -398,10 +411,11 @@ Booked %<%Y-%m-%d %H:%M>
 (add-to-list 'org-latex-packages-alist '("" "minted"))
 (setq org-latex-listings 'minted)
 (setq org-latex-minted-options
-      '(("frame" "none")
-        ("linenos" "false")
-        ("breaklines" "true")
-        ("resetmargins" "true")
+      '(("frame=single") 
+        ("linenos=false")
+        ("breaklines=true")
+        ("resetmargins=true")
+        ("samepage=true")
         ("fontsize=\\footnotesize")))
 (setq org-latex-pdf-process
       '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
@@ -415,7 +429,6 @@ Booked %<%Y-%m-%d %H:%M>
 
 (org-babel-do-load-languages 'org-babel-load-languages
                              '((plantuml . t)
-                               (dot . t)
                                (python . t)
                                (js . t)
                                ;(html . t)
@@ -423,12 +436,14 @@ Booked %<%Y-%m-%d %H:%M>
 
 (setq org-plantuml-jar-path
       (expand-file-name "~/jars/plantuml.jar"))
-#+end_src
+\end{minted}
+\end{enumerate}
 
-*** Misc
+\subsubsection{Misc}
+\label{sec-1-2-3}
 Misc settings that should probably be somewhere else:
 
-#+begin_src emacs-lisp
+\begin{minted}[frame=single,linenos=false,breaklines=true,resetmargins=true,samepage=true,fontsize=\footnotesize]{common-lisp}
 (ido-mode t)
 
 (setq nrepl-log-messages t)
@@ -438,11 +453,12 @@ Misc settings that should probably be somewhere else:
                                               (compose-region (match-beginning 1)
                                                               (match-end 1)
                                                               "\u03BB")))))) ; lambda symbol
-#+end_src
+\end{minted}
 
-*** Perl
+\subsubsection{Perl}
+\label{sec-1-2-4}
 
-#+begin_src emacs-lisp
+\begin{minted}[frame=single,linenos=false,breaklines=true,resetmargins=true,samepage=true,fontsize=\footnotesize]{common-lisp}
 (defalias 'perl-mode 'cperl-mode)
 ;; PBP says only use spaces
 
@@ -462,28 +478,38 @@ Misc settings that should probably be somewhere else:
   '(cperl-tab-always-indent t)
   ;; my changes:
   '(cperl-array-face ((t nil))))
-#+end_src
+\end{minted}
 
-*** Fonts
+\subsubsection{Fonts}
+\label{sec-1-2-5}
 
 I can't really make up my mind what my preferred font is, but at the moment it's Fira Mono.
-It can be downloaded from Fira's [[https://github.com/mozilla/Fira][GitHub repo]] in the /ttf folder.
+It can be downloaded from Fira's \href{https://github.com/mozilla/Fira}{GitHub repo} in the /ttf folder.
 
 Other fonts I like include (in no particular order) Inconsolata, Consolas, Droid Sans Mono, Ubuntu Mono.
 
-#+begin_src emacs-lisp
+\href{http://larsenwork.com/monoid/}{Monoid} seems cool, if a little edgy.
+
+\begin{minted}[frame=single,linenos=false,breaklines=true,resetmargins=true,samepage=true,fontsize=\footnotesize]{common-lisp}
+(set-face-attribute 'default nil
+                    :family "Source Code Pro"
+                    :height 105 :weight 'medium)
 (set-face-attribute 'default nil
                     :family "Fira Mono"
                     :height 105 :weight 'medium)
-#+end_src
+(set-face-attribute 'variable-pitch nil
+                    :family "Droid Sans"
+                    :height 105 :weight 'medium)
+\end{minted}
 
-*** Executables
+\subsubsection{Executables}
+\label{sec-1-2-6}
 
 Sometimes we use Emacs on a computer that may not have certain binaries installed;
 this section is for the configuration of those sorts of things, based on the existence
 of those binaries.
 
-#+begin_src emacs-lisp
+\begin{minted}[frame=single,linenos=false,breaklines=true,resetmargins=true,samepage=true,fontsize=\footnotesize]{common-lisp}
 ;; ;; git clone https://github.com/slime/slime.git ~/.emacs.d/git/slime/
 ;; (when (executable-find "clisp")
 ;;   (add-to-list 'load-path "~/.emacs.d/git/slime")
@@ -493,14 +519,15 @@ of those binaries.
 
 (when (executable-find "pandoc")
   (setq markdown-command "pandoc -f markdown -t html"))
-#+end_src
+\end{minted}
 
-** Code
+\subsection{Code}
+\label{sec-1-3}
 
-Create a code header from the current line. Usage: call =my-comment-header= on the line you want
+Create a code header from the current line. Usage: call \texttt{my-comment-header} on the line you want
 to turn into a header.
 
-#+begin_src emacs-lisp
+\begin{minted}[frame=single,linenos=false,breaklines=true,resetmargins=true,samepage=true,fontsize=\footnotesize]{common-lisp}
 (defvar my-column-limiter 80)
 (defvar my-spacer-character ?_)
 
@@ -526,14 +553,15 @@ to turn into a header.
   "Indent the entire buffer."
   (interactive)
   (indent-region (point-min) (point-max)))
-#+end_src
+\end{minted}
 
-** Keybindings
+\subsection{Keybindings}
+\label{sec-1-4}
 
-Some keybindings are not in this section because they're with their relative =use-package=
+Some keybindings are not in this section because they're with their relative \texttt{use-package}
 section. Keeps the bindings with their package so they're easily found and changed/deleted.
 
-#+begin_src emacs-lisp
+\begin{minted}[frame=single,linenos=false,breaklines=true,resetmargins=true,samepage=true,fontsize=\footnotesize]{common-lisp}
 (global-set-key (kbd "C-c C-d") 'delete-trailing-whitespace)
 (global-set-key (kbd "C-c a") 'org-agenda)
 (global-set-key (kbd "C-c r") 'org-capture)
@@ -549,12 +577,13 @@ section. Keeps the bindings with their package so they're easily found and chang
 
 (global-set-key (kbd "C-c h") 'my-comment-header)
 (global-set-key (kbd "C-c e") 'my-edit-dotemacs)
-#+end_src
-** Emacs Settings
+\end{minted}
+\subsection{Emacs Settings}
+\label{sec-1-5}
 
 General, built-in settings for Emacs.
 
-#+begin_src emacs-lisp
+\begin{minted}[frame=single,linenos=false,breaklines=true,resetmargins=true,samepage=true,fontsize=\footnotesize]{common-lisp}
 ;; no scrollbars, toolbars or menubars
 (dolist (mode '(menu-bar-mode scroll-bar-mode tool-bar-mode))
   (when (fboundp mode) (funcall mode -1)))
@@ -569,7 +598,7 @@ General, built-in settings for Emacs.
 
 ;; indentation
 (setq-default indent-tabs-mode nil
-							tab-width 4)
+              tab-width 4)
 
 ;; show matching parentheses
 (show-paren-mode 1)
@@ -612,4 +641,6 @@ General, built-in settings for Emacs.
 ;; dont prompt me every time I open symlinks
 ;; maybe move this to init.el
 (setq vc-follow-symlinks t)
-#+end_src
+\end{minted}
+% Emacs 24.4.1 (Org mode 8.2.10)
+\end{document}

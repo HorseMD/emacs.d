@@ -1,0 +1,18 @@
+(use-package smart-tabs-mode
+  ;; use tabs for indentation, spaces for alignment.
+  :disabled t
+  :init (setq-default indent-tabs-mode nil)
+  :config (progn
+            (add-hook 'prog-mode-hook (lambda () (setq indent-tabs-mode t)))
+            (smart-tabs-insinuate 'javascript)))
+
+(use-package ivy
+  :ensure t
+  :config (progn (ivy-mode 1)
+                 (use-package counsel
+                   :ensure t)
+                 (global-set-key (kbd "M-x") 'counsel-M-x)
+                 (global-set-key (kbd "C-x C-f") 'counsel-find-file)))
+
+(use-package whitespace
+  :init (setq whitespace-display-mappings
