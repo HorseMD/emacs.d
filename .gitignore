@@ -1,1 +1,3 @@
 \#*#
+*.pygtex
+/_minted-*/*

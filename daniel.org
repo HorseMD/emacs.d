@@ -28,6 +28,7 @@ Most packages we use are on melpa:
 #+end_src
 
 ** Custom Packages
+
 *** Setup
 
 Let's use use-package!
@@ -109,6 +110,9 @@ that require no configuration (other than maybe an ensure):
   :ensure t
   :init (setq fuel-listener-factor-binary "/home/user/bin/factor/factor"
               fuel-listener-factor-image "/home/user/bin/factor/factor.image"))
+
+(use-package markdown-mode
+  :ensure t)
 #+end_src
 
 **** Webdev
@@ -149,6 +153,15 @@ that require no configuration (other than maybe an ensure):
             (add-hook 'js2-mode-hook #'js2-refactor-mode)
             (js2r-add-keybindings-with-prefix "C-c r")))
 
+(use-package indium
+  :ensure t
+  :init (defun setup-indium-chome-repl ()
+          (interactive)
+          (shell-command "chromium-browser --remote-debugging-port=9222 https://localhost:3000")
+          (indium-chrome--get-tabs-data "127.0.0.1"
+                                        "9222"
+                                        #'indium-chrome--connect-to-tab)))
+
 (use-package flymake
   :ensure t)
 
@@ -184,6 +197,7 @@ that require no configuration (other than maybe an ensure):
             (add-hook 'emacs-lisp-mode-hook 'enable-paredit-mode)))
 
 (use-package clojure-mode
+  :ensure t
   :init (add-hook 'clojure-mode-hook 'enable-paredit-mode))
 
 (use-package clj-refactor
@@ -231,10 +245,17 @@ that require no configuration (other than maybe an ensure):
   :config (global-whitespace-mode t))
 
 (use-package org-ref
-  :init (setq org-ref-default-citation-link "autocite"))
+  :init (setq
+         org-ref-completion-library 'org-ref-ivy-cite
+         ;org-ref-default-citation-link "autocite")
+         org-ref-default-citation-link "citep")
+)
+
+(use-package org-bullets
+  :config (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
 
 (use-package evil-quickscope
-  :init (add-hook 'prog-mode-hook 'turn-on-evil-quickscope-always-mode))
+  :config (add-hook 'prog-mode-hook 'turn-on-evil-quickscope-always-mode))
 
 (use-package elfeed)
 (use-package elfeed-goodies
@@ -257,15 +278,23 @@ that require no configuration (other than maybe an ensure):
                  (define-key evil-normal-state-map (kbd "C-k") (lambda ()
                                                                  (interactive)
                                                                  (evil-scroll-up nil)))
+
+                 (defun avoid-stupid-emacs-state () (lambda () (interactive) (message "Call evil-emacs-state if you REALLY want to start it.")))
+
+                 (define-key evil-normal-state-map (kbd "C-z") (avoid-stupid-emacs-state))
+                 (define-key evil-insert-state-map (kbd "C-z") (avoid-stupid-emacs-state))
+
                  (evil-set-initial-state 'elfeed-show-mode 'normal)
-                 (evil-set-initial-state 'elfeed-search-mode 'emacs)))
+                 (evil-set-initial-state 'elfeed-search-mode 'emacs)
+                 (evil-set-initial-state 'fuel-listener-mode 'insert)
+                 (evil-set-initial-state 'fuel-debug-mode 'insert)))
 
 (use-package evil-surround
   :ensure t
   :config (global-evil-surround-mode 1))
 
 (use-package org-evil
-  ; not to be confused with evil-org
+                                        ; not to be confused with evil-org
   :ensure t)
 #+end_src
 
@@ -298,7 +327,8 @@ My theme tastes change regularly enough to warrant keeping configuration for old
                              (powerline-center-evil-theme)
                              (display-time-mode t)))))
 
-(use-package dracula-theme
+(use-package darcula-theme
+  :disabled t
   :config (use-package powerline
             :ensure t
             :config (progn
@@ -306,13 +336,14 @@ My theme tastes change regularly enough to warrant keeping configuration for old
                       (display-time-mode t))))
 
 (use-package apropospriate-theme
-  :disabled t
+  :ensure t
   :init (progn
-          (load-theme 'apropospriate-dark)))
+          (load-theme 'apropospriate-dark t)))
 
 (use-package all-the-icons
   ;; be sure to download and install the fonts from https://github.com/domtronn/all-the-icons.el
   :ensure t)
+
 #+end_src
 
 **** Org
@@ -364,7 +395,16 @@ And the rest of the settings:
       org-src-window-setup 'current-window
       org-src-fontify-natively t
       org-src-tab-acts-natively t
-      org-deadline-warning-days 18)
+      org-deadline-warning-days 18
+      ;org-html-preamble nil
+      org-html-postamble nil
+      org-html-head-extra "<link rel=\"stylesheet\" href=\"./style.css\" />")
+
+(defun my-org-css-include-hook (exporter)
+  (when (eq exporter 'html)
+    (shell-command "cp ~/org/style.css .")))
+
+(add-hook 'org-export-before-processing-hook 'my-org-css-include-hook)
 
 (add-to-list 'org-modules 'org-habit)
 
@@ -403,15 +443,16 @@ Booked %<%Y-%m-%d %H:%M>
         ("breaklines" "true")
         ("resetmargins" "true")
         ("fontsize=\\footnotesize")))
+
 (setq org-latex-pdf-process
       '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+        "bibtex %b"
         "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
         "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
 
-(setq org-tag-alist '(("LEARN" . ?l)
-                      ("UNIVERSITY" . ?u)
-                      ("FUN" . ?f)
-                      ("PROJECT" . ?p)))
+(setq org-tag-alist '(("learning" . ?l)
+                      ("fun" . ?f)
+                      ("health" . ?h)))
 
 (org-babel-do-load-languages 'org-babel-load-languages
                              '((plantuml . t)
@@ -474,7 +515,10 @@ Other fonts I like include (in no particular order) Inconsolata, Consolas, Droid
 #+begin_src emacs-lisp
 (set-face-attribute 'default nil
                     :family "Fira Mono"
-                    :height 105 :weight 'medium)
+                    :height 110 
+                    :weight 'normal
+                    :width 'normal
+                    )
 #+end_src
 
 *** Executables
@@ -587,6 +631,7 @@ General, built-in settings for Emacs.
 (setq-default tab-width 2)
 
 ;; display line numbers only when programming
+(setq linum-format " %d")
 (add-hook 'prog-mode-hook (lambda () (linum-mode 1)))
 
 ;; fix minor annoyances
