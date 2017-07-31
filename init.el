@@ -10,39 +10,3 @@
 (require 'ob-tangle)
 
 (org-babel-load-file (expand-file-name "~/.emacs.d/daniel.org"))
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(cperl-array-face ((t nil)))
- '(cperl-close-paren-offset -4)
- '(cperl-continued-statement-offset 4)
- '(cperl-indent-level 4)
- '(cperl-indent-parens-as-block t)
- '(cperl-tab-always-indent t)
- '(org-src-lang-modes
-   (quote
-    (("ocaml" . tuareg)
-     ("elisp" . emacs-lisp)
-     ("ditaa" . artist)
-     ("asymptote" . asy)
-     ("dot" . fundamental)
-     ("sqlite" . sql)
-     ("calc" . fundamental)
-     ("C" . c)
-     ("cpp" . c++)
-     ("C++" . c++)
-     ("screen" . shell-script)
-     ("shell" . sh)
-     ("dot" . graphviz-dot-mode)
-     ("bash" . sh))))
- '(package-selected-packages
-   (quote
-    (indium org-bullets apropospriate-theme airline-themes demo-it tide markdown-mode darcula-theme evil-tutor fuel org-indent-mode org-indent pug-mode elfeed-goodies elfeed-org which-key web-mode use-package smart-tabs-mode rainbow-delimiters projectile-speedbar projectile powerline org-evil org-dashboard neotree moe-theme magit lua-mode jsx-mode json-mode js2-refactor google git-gutter-fringe flymake-perlcritic evil-surround evil-org elfeed edbi-sqlite devdocs counsel company-tern clj-refactor all-the-icons))))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
