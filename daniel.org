@@ -6,6 +6,7 @@ Essentially this file takes the place of my original =init.el= file. That file i
 used to load /this/ file, via =org-babel-load-file=.
 
 ** Setup
+
 *** Add directories
 
 I like to keep a directory in =~/.emacs.d= to throw things in to be put in Emacs's load path.
@@ -161,8 +162,6 @@ that require no configuration:
   :init (progn
           (add-hook 'cider-repl-mode-hook 'enable-paredit-mode)
           (add-hook 'cider-mode-hook #'eldoc-mode)))
-
-(use-package geiser)
 #+end_src
 
 **** Misc
@@ -223,12 +222,7 @@ that require no configuration:
                  (defun avoid-stupid-emacs-state () (lambda () (interactive) (message "Call evil-emacs-state if you REALLY want to start it.")))
 
                  (define-key evil-normal-state-map (kbd "C-z") (avoid-stupid-emacs-state))
-                 (define-key evil-insert-state-map (kbd "C-z") (avoid-stupid-emacs-state))
-
-                 (evil-set-initial-state 'elfeed-show-mode 'normal)
-                 (evil-set-initial-state 'elfeed-search-mode 'emacs)
-                 (evil-set-initial-state 'fuel-listener-mode 'insert)
-                 (evil-set-initial-state 'fuel-debug-mode 'insert)))
+                 (define-key evil-insert-state-map (kbd "C-z") (avoid-stupid-emacs-state))))
 
 (use-package evil-surround
   :config (global-evil-surround-mode 1))
@@ -236,47 +230,12 @@ that require no configuration:
 (use-package org-evil) ; not to be confused with evil-org
 #+end_src
 
-**** Theme
-
-My theme tastes change regularly enough to warrant keeping configuration for old ones:
+**** Theming
 
 #+begin_src emacs-lisp
-(use-package zenburn
-  :disabled t
-  :ensure zenburn-theme
-  :init (progn
-          (load-theme 'zenburn 'no-confirm)
-          (set-background-color "#282828")
-          (set-face-attribute 'region nil :background "#c6d4c5" :foreground "#444")))
-
-(use-package sanityinc-tomorrow-eighties
-  :disabled t
-  :init (load-theme 'sanityinc-tomorrow-eighties 'no-confirm))
-
-(use-package moe-theme
-  :disabled t
-  :config (progn (moe-theme-set-color 'magenta)
-                 (moe-light)
-                 (use-package powerline
-                   :ensure t
-                   :config (progn
-                             (powerline-moe-theme)
-                             ;; call powerline-moe-theme to set the colours to fit with our theme.
-                             (powerline-center-evil-theme)
-                             (display-time-mode t)))))
-
-(use-package darcula-theme
-  :disabled t
-  :config (use-package powerline
-            :ensure t
-            :config (progn
-                      (powerline-center-evil-theme)
-                      (display-time-mode t))))
-
 (use-package apropospriate-theme
   :init (progn
           (load-theme 'apropospriate-dark t)))
-
 #+end_src
 
 **** Org
@@ -286,30 +245,13 @@ Some helper functions to get nice agenda-views:
 #+begin_src emacs-lisp
 (defun my-dayn-of-week ()
   "Get the numeric representation of the current day. Mon = 0, Sun = 7"
-  (let ((day (string-to-number (format-time-string "%u"))))
-    day))
+  (string-to-number (format-time-string "%u")))
 
 (defun my-+weekday-remainder (days)
   "Get the number of days plus the rest-of-the-week. Defaults to a week."
   (let* ((day (my-dayn-of-week))
          (remain (- 7 day)))
     (+ (or days 7) remain)))
-#+end_src
-
-I tend to store a lot of links, so I like this to be automated.
-
-#+begin_src emacs-lisp
-(defun my-get-clipboard-contents ()
-  (with-temp-buffer
-    (yank)
-    (buffer-string)))
-
-(defun my-insert-org-link ()
-  (interactive)
-  (progn (let* ((link (my-get-clipboard-contents))
-                (reference (read-string "URL Placeholder: "))
-                (my-org-link (format "[[%s][%s]]" link reference) ))
-           (insert my-org-link))))
 #+end_src
 
 And the rest of the settings:
@@ -399,49 +341,17 @@ Booked %<%Y-%m-%d %H:%M>
       (expand-file-name "~/jars/plantuml.jar"))
 #+end_src
 
-*** Misc
-Misc settings that should probably be somewhere else:
-
-#+begin_src emacs-lisp
-(ido-mode t)
-
-(setq nrepl-log-messages t)
-
-(font-lock-add-keywords 'emacs-lisp-mode
-                        '(("(\\(lambda\\)\\>" (0 (prog1 ()
-                                              (compose-region (match-beginning 1)
-                                                              (match-end 1)
-                                                              "\u03BB")))))) ; lambda symbol
-#+end_src
-
 *** Perl
 
 #+begin_src emacs-lisp
 (defalias 'perl-mode 'cperl-mode)
-;; PBP says only use spaces
-
-;; from http://www.perlmonks.org/?node_id=650413
-
-;; (add-to-list 'auto-mode-alist '("\\.\\([pP]\\([Llm]\\|[oO][dD]\\)\\|al
-;; +\\)\\'" . cperl-mode))
-;; (add-to-list 'interpreter-mode-alist '("perl" . cperl-mode))
-;; (add-to-list 'interpreter-mode-alist '("perl5" . cperl-mode))
-;; (add-to-list 'interpreter-mode-alist '("miniperl" . cperl-mode))
-
-(custom-set-variables
-  '(cperl-close-paren-offset -4)
-  '(cperl-continued-statement-offset 4)
-  '(cperl-indent-level 4)
-  '(cperl-indent-parens-as-block t)
-  '(cperl-tab-always-indent t)
-  ;; my changes:
-  '(cperl-array-face ((t nil))))
+(setq cperl-auto-newline t)
 #+end_src
 
 *** Fonts
 
 I can't really make up my mind what my preferred font is, but at the moment it's Fira Mono.
-It can be downloaded from Fira's [[https://github.com/mozilla/Fira][GitHub repo]] in the /ttf folder.
+It can be downloaded from Fira's [[https://github.com/mozilla/Fira][GitHub repo]] in the /ttf folder, but some Linux distributions have it in their repos.
 
 Other fonts I like include (in no particular order) Inconsolata, Consolas, Droid Sans Mono, Ubuntu Mono.
 
@@ -450,8 +360,7 @@ Other fonts I like include (in no particular order) Inconsolata, Consolas, Droid
                     :family "Fira Mono"
                     :height 110 
                     :weight 'normal
-                    :width 'normal
-                    )
+                    :width 'normal)
 #+end_src
 
 *** Executables
@@ -461,13 +370,6 @@ this section is for the configuration of those sorts of things, based on the exi
 of those binaries.
 
 #+begin_src emacs-lisp
-;; ;; git clone https://github.com/slime/slime.git ~/.emacs.d/git/slime/
-;; (when (executable-find "clisp")
-;;   (add-to-list 'load-path "~/.emacs.d/git/slime")
-;;   (require 'slime-autoloads)
-;;   (setq inferior-lisp-program (executable-find "clisp"))
-;;   (setq slime-contribs '(slime-fancy)))
-
 (when (executable-find "pandoc")
   (setq markdown-command "pandoc -f markdown -t html"))
 #+end_src
@@ -498,7 +400,7 @@ section. Keeps the bindings with their package so they're easily found and chang
 (global-set-key (kbd "C-c C-d") 'delete-trailing-whitespace)
 (global-set-key (kbd "C-c a") 'org-agenda)
 (global-set-key (kbd "C-c r") 'org-capture)
-(global-set-key (kbd "C-c l") 'my-insert-org-link)
+(global-set-key (kbd "C-c l") 'org-insert-link)
 
 ;; these shouldnt be global.
 (global-set-key (kbd "C-c C-,") 'org-promote-subtree)
@@ -508,6 +410,7 @@ section. Keeps the bindings with their package so they're easily found and chang
 
 (global-set-key (kbd "C-c e") 'my-edit-dotemacs)
 #+end_src
+
 ** Emacs Settings
 
 General, built-in settings for Emacs.
@@ -567,8 +470,4 @@ General, built-in settings for Emacs.
       kept-new-versions 4
       kept-old-versions 2
       version-control t)
-
-;; dont prompt me every time I open symlinks
-;; maybe move this to init.el
-(setq vc-follow-symlinks t)
 #+end_src
