@@ -7,14 +7,6 @@ used to load /this/ file, via =org-babel-load-file=.
 
 ** Setup
 
-*** Add directories
-
-I like to keep a directory in =~/.emacs.d= to throw things in to be put in Emacs's load path.
-
-#+begin_src emacs-lisp
-(add-to-list 'load-path "~/.emacs.d/autoload")
-#+end_src
-
 *** Add package sources
 
 Most packages we use are on melpa:
@@ -293,6 +285,7 @@ And the rest of the settings:
          (file+headline "~/org/organiser.org" "Organiser")
          "** TODO %^{Task}
 %?")
+
         ("a" "Appointment" entry
          (file "./appointments.org" "Appointments")
          "** TODO %^{Task}
