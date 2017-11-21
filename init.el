@@ -24,7 +24,7 @@
  '(cperl-tab-always-indent t)
  '(package-selected-packages
    (quote
-    (which-key web-mode use-package tide rainbow-delimiters org-ref org-evil org-bullets markdown-mode lua-mode json-mode js2-refactor git-gutter-fringe geiser flymake-perlcritic evil-surround evil-quickscope counsel-projectile company-tern clj-refactor apropospriate-theme all-the-icons))))
+    (kivy-mode glsl-mode atom-dark-theme ox-odt ox-odf which-key web-mode use-package tide rainbow-delimiters org-ref org-evil org-bullets markdown-mode lua-mode json-mode js2-refactor git-gutter-fringe geiser flymake-perlcritic evil-surround evil-quickscope counsel-projectile company-tern clj-refactor apropospriate-theme all-the-icons))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
