@@ -66,6 +66,10 @@ that require no configuration:
   :diminish which-key-mode
   :config (which-key-mode))
 
+(use-package company
+  :ensure t
+  :init (add-hook 'after-init-hook 'global-company-mode))
+
 (use-package lua-mode
   :mode "\\.lua\\'")
 
@@ -75,6 +79,10 @@ that require no configuration:
   :disabled t ; seemingly not on repos atm
   :init (setq fuel-listener-factor-binary "/home/user/bin/factor/factor"
               fuel-listener-factor-image "/home/user/bin/factor/factor.image"))
+
+(use-package magit
+  :ensure t
+  :config (global-set-key (kbd "C-x g") 'magit-status))
 #+end_src
 
 **** Webdev
@@ -153,6 +161,12 @@ that require no configuration:
                  (global-set-key (kbd "M-x") 'counsel-M-x)
                  (global-set-key (kbd "C-x C-f") 'counsel-find-file)))
 
+(use-package ledger-mode
+  :init (setq
+         ledger-mode-should-check-version nil
+         ledger-mode-report-links-in-register nil
+         ledger-binary-path "hledger"))
+
 (use-package org-ref
   :init (setq
          org-ref-completion-library 'org-ref-ivy-cite
@@ -224,8 +238,10 @@ And the rest of the settings:
 (require 'ox-odt)
 
 ;; Org-mode related hooks
-(add-hook 'org-mode-hook (lambda () (visual-line-mode t)))
 (add-hook 'org-mode-hook (lambda () (org-indent-mode)))
+(add-hook 'org-mode-hook (lambda () (visual-line-mode 1)))
+(add-hook 'prog-mode-hook (lambda () (visual-line-mode 0)))
+(add-hook 'latex-mode-hook (lambda () (visual-line-mode 1)))
 
 (setq org-log-done t
       org-edit-src-content-indentation 0
