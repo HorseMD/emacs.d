@@ -107,6 +107,11 @@ that require no configuration:
             (add-hook 'js2-mode-hook #'js2-refactor-mode)
             (js2r-add-keybindings-with-prefix "C-c r")))
 
+(use-package php-mode
+  :config (progn (use-package company-php
+                   :config (add-to-list 'company-backends 'company-ac-php-backend))
+                 (add-hook 'php-mode-hook '(lambda () (company-mode t)))))
+
 ;; (use-package flymake-perlcritic
 ;;   ;:mode "\\.pl\\'"
 ;;   :init (setq flymake-perlcritic-severity 3))
@@ -243,13 +248,10 @@ And the rest of the settings:
 (add-hook 'prog-mode-hook (lambda () (visual-line-mode 0)))
 (add-hook 'latex-mode-hook (lambda () (visual-line-mode 1)))
 
-(setq org-log-done t
-      org-edit-src-content-indentation 0
-      org-default-notes-file (concat org-directory "/organiser.org")
+(setq org-edit-src-content-indentation 0
       org-src-window-setup 'current-window
       org-src-fontify-natively t
       org-src-tab-acts-natively t
-      org-deadline-warning-days 18
       ;org-html-preamble nil
       org-html-postamble nil
       org-html-head-extra "<link rel=\"stylesheet\" href=\"./style.css\" />"
@@ -261,8 +263,39 @@ And the rest of the settings:
 
 (add-hook 'org-export-before-processing-hook 'my-org-css-include-hook)
 
-(add-to-list 'org-modules 'org-habit)
+(require 'ox-latex)
+(add-to-list 'org-latex-packages-alist '("" "minted"))
+(setq org-latex-listings 'minted)
+(setq org-latex-minted-options
+      '(("frame" "none")
+        ("linenos" "false")
+        ("breaklines" "true")
+        ("resetmargins" "true")
+        ("fontsize=\\footnotesize")))
 
+(setq org-latex-pdf-process
+      '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+        "bibtex %b"
+        "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+        "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
+
+(org-babel-do-load-languages 'org-babel-load-languages
+                             '((plantuml . t)
+                               (dot . t)
+                               (python . t)
+                               (js . t)
+                               ;(html . t)
+                               ))
+#+end_src
+
+**** Org-Agenda
+
+#+BEGIN_SRC emacs-lisp
+(setq org-default-notes-file (concat org-directory "/organiser.org")
+      org-log-done t
+      org-deadline-warning-days 18)
+
+(add-to-list 'org-modules 'org-habit)
 (add-to-list 'org-agenda-files (expand-file-name "~/org/"))
 
 ;; stuff done at stupid o'clock counts as 23:59 the previous night
@@ -290,38 +323,12 @@ Booked %<%Y-%m-%d %H:%M>
         ("m" "Next 28-ish Days" agenda ""
          ((org-agenda-span (my-+weekday-remainder 28))))))
 
-(require 'ox-latex)
-(add-to-list 'org-latex-packages-alist '("" "minted"))
-(setq org-latex-listings 'minted)
-(setq org-latex-minted-options
-      '(("frame" "none")
-        ("linenos" "false")
-        ("breaklines" "true")
-        ("resetmargins" "true")
-        ("fontsize=\\footnotesize")))
-
-(setq org-latex-pdf-process
-      '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
-        "bibtex %b"
-        "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
-        "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
-
 (setq org-tag-alist '(("learning" . ?l)
                       ("fun" . ?f)
                       ("health" . ?h)
                       ("job" ?j)))
 
-(org-babel-do-load-languages 'org-babel-load-languages
-                             '((plantuml . t)
-                               (dot . t)
-                               (python . t)
-                               (js . t)
-                               ;(html . t)
-                               ))
-
-(setq org-plantuml-jar-path
-      (expand-file-name "~/jars/plantuml.jar"))
-#+end_src
+#+END_SRC
 
 *** Fonts
 
