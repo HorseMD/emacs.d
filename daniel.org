@@ -296,26 +296,31 @@ And the rest of the settings:
       org-deadline-warning-days 18)
 
 (add-to-list 'org-modules 'org-habit)
-(add-to-list 'org-agenda-files (expand-file-name "~/org/"))
+(add-to-list 'org-agenda-files (expand-file-name org-directory))
 
 ;; stuff done at stupid o'clock counts as 23:59 the previous night
-(setq org-use-effective-time t)
+(setq org-extend-today-until 2
+      org-use-effective-time t)
 
 (setq org-capture-templates
       '(("t" "Tasks" entry
-         (file+headline "~/org/organiser.org" "Organiser")
+         (file+headline org-default-notes-file "Organiser")
          "** TODO %^{Task}
+%?")
+
+        ("p" "Project" entry
+         (file "./projects.org")
+         "** TODO %^{Project}
 %?")
 
         ("a" "Appointment" entry
-         (file "./appointments.org" "Appointments")
+         (file "./appointments.org")
          "** TODO %^{Task}
-Booked %<%Y-%m-%d %H:%M>
 %?")
 
         ("i" "Idea" entry
-         (file "./ideas.org" "Ideas")
-         "* IDEA %?")))
+         (file "./ideas.org")
+         "* IDEA: %?")))
 
 (setq org-agenda-custom-commands
       '(("g" "This fortnight" agenda ""
