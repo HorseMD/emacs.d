@@ -78,10 +78,8 @@ that require no configuration:
 (use-package lua-mode
   :mode "\\.lua\\'")
 
-(use-package kivy-mode)
-
 (use-package fuel
-  :disabled t ; seemingly not on repos atm
+  :disabled t
   :init (setq fuel-listener-factor-binary "/home/user/bin/factor/factor"
               fuel-listener-factor-image "/home/user/bin/factor/factor.image"))
 
@@ -100,7 +98,7 @@ that require no configuration:
 ;; make sure you install tern via npm (npm install -g tern)
 (use-package tern
   :config (when (file-exists-p "/usr/bin/tern")
-              (add-hook 'js2-mode-hook (lambda () (tern-mode 1)))))
+            (add-hook 'js2-mode-hook (lambda () (tern-mode 1)))))
 
 (use-package js2-mode
   :mode "\\.js\\'"
@@ -116,22 +114,6 @@ that require no configuration:
   :config (progn (use-package company-php
                    :config (add-to-list 'company-backends 'company-ac-php-backend))
                  (add-hook 'php-mode-hook '(lambda () (company-mode t)))))
-
-;; (use-package flymake-perlcritic
-;;   ;:mode "\\.pl\\'"
-;;   :init (setq flymake-perlcritic-severity 3))
-
-;; (defun init-tide ()
-;;   (interactive)
-;;   (tide-setup)
-;;   (flymake-mode 1)
-;;   (eldoc-mode 1)
-;;   (tide-hl-identifier-mode 1))
-
-;; (use-package tide
-;;   :init (progn
-;;           (add-hook 'before-save-hook 'tide-format-before-save)
-;;           (add-hook 'typescript-mode-hook #'init-tide)))
 #+end_src
 
 **** Lisp
@@ -180,7 +162,7 @@ that require no configuration:
 (use-package org-ref
   :init (setq
          org-ref-completion-library 'org-ref-ivy-cite
-         ;org-ref-default-citation-link "autocite")
+       ; org-ref-default-citation-link "autocite")
          org-ref-default-citation-link "citep"))
 
 (use-package org-bullets
@@ -211,6 +193,8 @@ that require no configuration:
   :config (global-evil-surround-mode 1))
 
 (use-package org-evil) ; not to be confused with evil-org
+
+(use-package evil-magit)
 #+end_src
 
 **** Theming
@@ -259,7 +243,7 @@ And the rest of the settings:
       org-src-window-setup 'current-window
       org-src-fontify-natively t
       org-src-tab-acts-natively t
-      ;org-html-preamble nil
+    ; org-html-preamble nil
       org-html-postamble nil
       org-html-head-extra "<link rel=\"stylesheet\" href=\"./style.css\" />"
       org-latex-logfiles-extensions '("lof" "lot" "tex" "tex~" "aux" "idx" "log" "out" "toc" "nav" "snm" "vrb" "dvi" "fdb_latexmk" "blg" "brf" "fls" "entoc" "ps" "spl" "bbl"))
@@ -291,7 +275,7 @@ And the rest of the settings:
                                (dot . t)
                                (python . t)
                                (js . t)
-                               ;(html . t)
+                             ; (html . t)
                                ))
 #+end_src
 
