@@ -464,4 +464,6 @@ General, built-in settings for Emacs.
       kept-new-versions 4
       kept-old-versions 2
       version-control t)
+
+'(browse-url-browser-function (quote eww-browse-url))
 #+end_src
